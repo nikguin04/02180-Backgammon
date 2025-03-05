@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
     <style.color>always</style.color>
-    <exec.mainClass>src.main.java.com.dtu.backgammon.App</exec.mainClass>
+    <exec.mainClass>com.dtu.backgammon.App</exec.mainClass>
   </properties>
 
   <dependencyManagement>
@@ -98,7 +98,7 @@
               <manifest>
                 <addClasspath>true</addClasspath>
                 <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>src.main.java.com.dtu.backgammon.App</mainClass>
+                <mainClass>com.dtu.backgammon.App</mainClass>
               </manifest>
             </archive>
           </configuration>
