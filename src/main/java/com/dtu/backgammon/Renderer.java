@@ -39,7 +39,7 @@ public class Renderer {
             for (int j = 12; j < 24; j++) {
                 if (j == 18) { System.out.print(bcol(graybar_color) + "   "); }
                 Brick brick = board.getBrickAt(j, i);
-                System.out.print(bcol(j%2 == 0 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
+                System.out.print(bcol(j%2 == 1 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
             }
             System.out.println();
         }
