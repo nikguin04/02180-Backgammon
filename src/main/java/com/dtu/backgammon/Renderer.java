@@ -47,10 +47,7 @@ public class Renderer {
             }
             System.out.println();
         }
-
-        
-        
-
+        resetColor();
         // Temporary move cursor below board
         moveCur(0, 20);
     }
@@ -82,13 +79,16 @@ public class Renderer {
         System.out.println(esc + "[m" + bcol(backgroundcolor));
     }
     private static void clearScreen(boolean keepColor) {
-        System.out.println((keepColor ? (esc + "[0m]") : "" ) + esc + "[2J");
+        System.out.println((keepColor ? (esc + "[0m") : "" ) + esc + "[2J");
     }
     private static String bcol(String rgbcol) {
         return esc + "[48;2;" + rgbcol + "m";
     }
     private static String fcol(String rgbcol) {
         return esc + "[38;2;" + rgbcol + "m";
+    }
+    private static void resetColor() {
+        System.out.println(esc + "[0m");
     }
     private static void moveCur(int x, int y) {
         System.out.print(esc + String.format("[%d;%dH", y, x));
