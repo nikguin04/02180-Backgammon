@@ -1,6 +1,9 @@
 package com.dtu.backgammon;
 
+import java.util.List;
+
 import com.dtu.backgammon.Board.Brick;
+import com.dtu.backgammon.player.Player;
 
 public class Renderer {
     // See ANSI commands https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
@@ -10,6 +13,7 @@ public class Renderer {
         //setBackgroundColor();
         clearScreen(false);
         printBoard(board);
+        printPlayers(board.players);
     }
 
     static String graybar_color = "40;40;40";
@@ -43,12 +47,16 @@ public class Renderer {
             }
             System.out.println();
         }
-
-        
-        
-
+        resetColor();
         // Temporary move cursor below board
         moveCur(0, 20);
+    }
+
+    private static void printPlayers(List<Player> players) {
+        System.out.println();
+        for (int i = 0; i < players.size(); i++) {
+            System.out.print((i>0 ? " Vs. " : "") + players.get(i).getName());
+        }
     }
 
     static String white_color = "255;255;255";
@@ -71,13 +79,16 @@ public class Renderer {
         System.out.println(esc + "[m" + bcol(backgroundcolor));
     }
     private static void clearScreen(boolean keepColor) {
-        System.out.println((keepColor ? (esc + "[0m]") : "" ) + esc + "[2J");
+        System.out.println((keepColor ? (esc + "[0m") : "" ) + esc + "[2J");
     }
     private static String bcol(String rgbcol) {
         return esc + "[48;2;" + rgbcol + "m";
     }
     private static String fcol(String rgbcol) {
         return esc + "[38;2;" + rgbcol + "m";
+    }
+    private static void resetColor() {
+        System.out.println(esc + "[0m");
     }
     private static void moveCur(int x, int y) {
         System.out.print(esc + String.format("[%d;%dH", y, x));
