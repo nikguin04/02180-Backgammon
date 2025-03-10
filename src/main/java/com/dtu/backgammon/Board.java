@@ -25,6 +25,18 @@ public class Board {
         for (int i = 0; i < 24; i++) {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
+        
+        board.get(0).brick = Brick.WHITE;
+        board.get(0).count = 3;
+
+        board.get(2).brick = Brick.BLACK;
+        board.get(2).count = 4;
+
+        board.get(7).brick = Brick.WHITE;
+        board.get(7).count = 2;
+
+        board.get(14).brick = Brick.WHITE;
+        board.get(14).count = 3;
 
         setupPlayers();
     }
