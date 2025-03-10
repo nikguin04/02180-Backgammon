@@ -58,4 +58,18 @@ public class Board {
     public Brick getBrickAt(int column, int depth) {
         return (board.get(column).count > depth) ? board.get(column).brick : Brick.NONE;
     }
+
+    public boolean isValidMove(Move move, Brick player, int roll) {
+        if (move.isBearingOff()) {
+            // TODO: check that all stones are on home board
+            return move.from() < roll;
+        }
+        // TODO: Force player to reenter stones from the bar
+        BoardElement toPoint = board.get(move.from());
+        if (toPoint.brick != Brick.NONE && toPoint.brick != player && toPoint.count > 1) {
+            return false;
+        }
+        // TODO: Other edge cases like the one described in https://en.wikipedia.org/wiki/Backgammon#Bearing_off?
+        return true;
+    }
 }
