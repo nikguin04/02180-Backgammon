@@ -1,4 +1,4 @@
-package com.dtu.backgammon.player;
+package com.dtu.backgammon;
 
 import java.util.Random;
 

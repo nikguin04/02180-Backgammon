@@ -7,7 +7,7 @@ public abstract class Player {
     public Player(Brick brick) {
         this.brick = brick;
     }
-    
-    public abstract void Move();
+
+    public abstract void getMove();
     public abstract String getName();
 }

@@ -14,7 +14,7 @@ public class Human extends Player {
     }
 
     @Override
-    public void Move() {
+    public void getMove() {
         Scanner scanner = App.scanner;
         String moveInput;
 
