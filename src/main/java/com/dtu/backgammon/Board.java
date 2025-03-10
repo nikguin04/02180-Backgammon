@@ -2,6 +2,7 @@ package com.dtu.backgammon;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,8 @@ public class Board {
         Brick brick;
         int count;
         public BoardElement(Brick brick, int count) { this.brick = brick; this.count = count; }
+        @Override
+        public BoardElement clone() { return new BoardElement(brick, count); }
     }
 
     public List<BoardElement> board;
@@ -28,6 +31,9 @@ public class Board {
         }
 
         setupPlayers();
+    }
+    public Board(List<BoardElement> board, List<Player> players) {
+        this.board = board; this.players = players;
     }
 
     private void setupPlayers() throws Exception {
@@ -54,6 +60,7 @@ public class Board {
                     throw new Exception("Failed to match input for player type: " + playerType);
             }
         }
+        
     }
 
     public Brick getBrickAt(int column, int depth) {
@@ -66,51 +73,71 @@ public class Board {
             return move.from() < roll;
         }
         // TODO: Force player to reenter stones from the bar
-        BoardElement toPoint = board.get(move.from());
+        BoardElement toPoint = board.get(move.to());
         if (toPoint.brick != Brick.NONE && toPoint.brick != player && toPoint.count > 1) {
             return false;
         }
         // TODO: Other edge cases like the one described in https://en.wikipedia.org/wiki/Backgammon#Bearing_off?
         return true;
     }
-    
-    public Move[][] actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves 
-        List<Move[]> moves = new ArrayList<Move[]>();
-        for (int i = 0; i < board.size(); i++) {
-            if (board.get(i).brick == player) { // The current player has bricks to move here
-                Move move = new Move(i, i-diceMoves.get(0)); // This should be able to go in either direction
-                // TODO: Check that move is not below 0 and above 23
-                if (!this.isValidMove(move, player, diceMoves.get(0))) { continue; } // Move is not valid
 
-                diceMoves.remove(0);
-                
-                if (diceMoves.size() > 0) {
-                    Board newBoard = this.clone();
-                    newBoard.performMove(move);
-                    Move[][] actions = newBoard.actions(player, diceMoves);
-                    for (int j = 0; j < actions.length; j++) {
-                        List<Move> nestMoves = Arrays.asList(actions[j]);
-                        nestMoves.add(0, move);
-                        moves.add( (Move[]) nestMoves.toArray() );
+    // Note, does not check validity!
+    public void performMove(Move move) {
+        board.get(move.from()).count--;
+        board.get(move.to()).count++;
+        board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
+        if (board.get(move.from()).count == 0) { board.get(move.from()).brick = Brick.NONE; } // Set brick to none if board is empty
+        
+    }
+    
+    public List<Move[]> actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves 
+        List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
+        if (diceMoves.size() < 2 || diceMoves.get(0) == diceMoves.get(1)) { // All eyes are equal
+            diceMovesAnyOrder.add(diceMoves);
+        } else {
+            // Scuffed way of reversing dice moves
+            diceMovesAnyOrder.add(new ArrayList<>( Arrays.asList(new Integer[] {diceMoves.get(0), diceMoves.get(1)}) ));
+            diceMovesAnyOrder.add(new ArrayList<>( Arrays.asList(new Integer[] {diceMoves.get(1), diceMoves.get(0)}) ));
+        }
+
+        List<Move[]> moves = new ArrayList<Move[]>();
+        for (List<Integer> diceMove : diceMovesAnyOrder) {
+            for (int i = 0; i < board.size(); i++) {
+                if (board.get(i).brick == player) { // The current player has bricks to move here
+                    Move move = new Move(i, i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1)); // Goes 0->23 for white and 23->0 for black
+
+                    if (move.to() > 23 || move.to() < 0) { continue; } // TODO: Implement the logic for bearing off and reentry
+                    if (!this.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
+
+                    List<Integer> newDiceMoves = new ArrayList<>(diceMove);
+                    newDiceMoves.remove(0);
+                    
+                    if (newDiceMoves.size() > 0) {
+                        Board newBoard = this.clone();
+                        newBoard.performMove(move);
+                        List<Move[]> actions = newBoard.actions(player, newDiceMoves);
+                        for (int j = 0; j < actions.size(); j++) {
+                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(actions.get(j)));
+                            nestMoves.add(0, move);
+                            moves.add( nestMoves.toArray(Move[]::new) ); // Add list of new moves at this state to the moves array
+                        }
+                    } else {
+                        moves.add(new Move[] { move });
                     }
-                } else {
-                    moves.add(new Move[] { move });
                 }
             }
         }
-        return (Move[][])moves.toArray();
+        return moves;
     }
 
 
     @Override
     public Board clone() {
         // Returning a clone of the current object
-        try {
-            return (Board) super.clone(); 
-        } catch (CloneNotSupportedException e) {
-            System.err.println("Error with cloning board, exiting.");
-            System.exit(1);
-            return this;
-        }
+        List<BoardElement> boarde = new ArrayList<>();
+        for (BoardElement p : this.board) {boarde.add(p.clone());}
+        List<Player> players = new ArrayList<>();
+        for (Player p : this.players) {players.add(p);} // NOTE: do not clone this since we can use players as duplicates
+        return new Board(boarde, players);
     }
 }

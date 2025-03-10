@@ -1,5 +1,6 @@
 package com.dtu.backgammon.player;
 
+import com.dtu.backgammon.Board.BoardElement;
 import com.dtu.backgammon.Board.Brick;
 
 public abstract class Player {
