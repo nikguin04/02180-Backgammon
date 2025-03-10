@@ -10,7 +10,7 @@ public abstract class Player {
         this.brick = brick;
         this.board = board;
     }
-    
+
     public abstract void getMove();
     public abstract String getName();
 }
