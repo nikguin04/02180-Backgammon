@@ -8,6 +8,6 @@ public abstract class Player {
         this.brick = brick;
     }
     
-    public abstract void getMove();
+    public abstract void Move();
     public abstract String getName();
 }

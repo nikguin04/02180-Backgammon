@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ab548d-e0a2-41f9-ab89-b305a0b5f317" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Dice.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Move.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Human.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Human.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtu/backgammon/player/Player.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +178,7 @@
       <workItem from="1741500521378" duration="328000" />
       <workItem from="1741501461824" duration="1186000" />
       <workItem from="1741590218329" duration="2468000" />
-      <workItem from="1741592729512" duration="446000" />
+      <workItem from="1741592729512" duration="2127000" />
     </task>
     <servers />
   </component>
