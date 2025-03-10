@@ -1,6 +1,7 @@
 package com.dtu.backgammon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -71,5 +72,45 @@ public class Board {
         }
         // TODO: Other edge cases like the one described in https://en.wikipedia.org/wiki/Backgammon#Bearing_off?
         return true;
+    }
+    
+    public Move[][] actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves 
+        List<Move[]> moves = new ArrayList<Move[]>();
+        for (int i = 0; i < board.size(); i++) {
+            if (board.get(i).brick == player) { // The current player has bricks to move here
+                Move move = new Move(i, i-diceMoves.get(0)); // This should be able to go in either direction
+                // TODO: Check that move is not below 0 and above 23
+                if (!this.isValidMove(move, player, diceMoves.get(0))) { continue; } // Move is not valid
+
+                diceMoves.remove(0);
+                
+                if (diceMoves.size() > 0) {
+                    Board newBoard = this.clone();
+                    newBoard.performMove(move);
+                    Move[][] actions = newBoard.actions(player, diceMoves);
+                    for (int j = 0; j < actions.length; j++) {
+                        List<Move> nestMoves = Arrays.asList(actions[j]);
+                        nestMoves.add(0, move);
+                        moves.add( (Move[]) nestMoves.toArray() );
+                    }
+                } else {
+                    moves.add(new Move[] { move });
+                }
+            }
+        }
+        return (Move[][])moves.toArray();
+    }
+
+
+    @Override
+    public Board clone() {
+        // Returning a clone of the current object
+        try {
+            return (Board) super.clone(); 
+        } catch (CloneNotSupportedException e) {
+            System.err.println("Error with cloning board, exiting.");
+            System.exit(1);
+            return this;
+        }
     }
 }
