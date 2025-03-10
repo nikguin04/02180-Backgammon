@@ -1,20 +1,12 @@
 package com.dtu.backgammon;
 
-public class Move {
-    private int from;
-    private int to;
-
-    public Move(int from, int to) {
-        this.from = from;
-        this.to = to;
+public record Move(int from, int to) {
+    public boolean isReentry() {
+        return from == -1;
     }
 
-    public int getFrom() {
-        return from;
-    }
-
-    public int getTo() {
-        return to;
+    public boolean isBearingOff() {
+        return to == -1;
     }
 
     @Override
