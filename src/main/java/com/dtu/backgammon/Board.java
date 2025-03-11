@@ -109,16 +109,6 @@ public class Board {
         if (!move.isReentry() || !move.isBearingOff()) {
             if (move.to() > 23 || move.to() < 0) {
                 return false;
-
-            }
-            if(player == Brick.WHITE && barWhite == 0){
-                return move.to() == move.from() + roll;
-
-            }
-
-            if(player == Brick.BLACK && barBlack == 0){
-                return move.to() == move.from() - roll;
-
             }
             if ((player == Brick.WHITE && barWhite > 0) || (player == Brick.BLACK && barBlack > 0)) {
                 if (!move.isReentry()) {
@@ -141,6 +131,16 @@ public class Board {
             if (move.isBearingOff()) {
                 return (player != Brick.WHITE || whiteHomeBoard == maxWhiteHomeBoard) &&
                         (player != Brick.BLACK || blackHomeBoard == maxBlackHomeBoard);
+            }
+
+            if(player == Brick.WHITE && barWhite == 0){
+                return move.to() == move.from() + roll;
+
+            }
+
+            if(player == Brick.BLACK && barBlack == 0){
+                return move.to() == move.from() - roll;
+
             }
         }
         return true;
