@@ -189,12 +189,12 @@ public class Board {
             else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count > 17){
                 blackHomeBoard++;
             }
-            else if (board.get(move.from()).brick == Brick.WHITE && board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count ==1){
+            else if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).brick == Brick.BLACK && board.get(move.to()).count ==1){
                 barBlack++;
                 board.get(move.to()).count--;
                 board.get(move.to()).brick = Brick.NONE;
             }
-            else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count ==1){
+            else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).brick == Brick.WHITE && board.get(move.to()).count ==1){
                 barWhite++;
                 board.get(move.to()).count--;
                 board.get(move.to()).brick = Brick.NONE;
