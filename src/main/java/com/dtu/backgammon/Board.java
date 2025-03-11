@@ -171,11 +171,11 @@ public class Board {
             }
         }
         else if (move.isReentry()) {
-            if (board.get(move.from()).brick == Brick.WHITE) {
+            if (move.brick() == Brick.WHITE) {
                 barWhite--;
                 board.get(move.to()).count++;
                 board.get(move.to()).brick = Brick.WHITE;
-            } else if (board.get(move.from()).brick == Brick.BLACK) {
+            } else if (move.brick() == Brick.BLACK) {
                 barBlack--;
                 board.get(move.to()).count++;
                 board.get(move.to()).brick = Brick.BLACK;

@@ -1,7 +1,8 @@
 package com.dtu.backgammon;
 
+import com.dtu.backgammon.Board.Brick;
 
-public record Move(int from, int to, MoveType movetype) {
+public record Move(int from, int to, MoveType movetype, Brick brick) {
     public enum MoveType {
         NORMAL,BEARINGOFF,REENTRY
     }

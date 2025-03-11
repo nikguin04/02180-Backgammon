@@ -49,12 +49,12 @@ public class AI extends Player {
                 if (board.hasBrickInTray(player)) { // Player has brick in the tray and needs to move them out first.
                     int startPos = player == Brick.BLACK ? Board.BLACK_START : Board.WHITE_START;
                     int toPosition = startPos + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1); // Calculate the absolut to position for reentry
-                    move = new Move(startPos, toPosition, Move.MoveType.REENTRY);
+                    move = new Move(startPos, toPosition, Move.MoveType.REENTRY, player);
                     i = boardElements.size(); // Make sure to break loop if we have a brick in tray.
                 } else {
                     int toPosition = i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1);
                     Move.MoveType movetype = toPosition > 23 || toPosition < 0 ? Move.MoveType.BEARINGOFF : Move.MoveType.NORMAL; // Players can only move in their right direction which means this logic works for either player.
-                    move = new Move(i, toPosition, movetype); // Goes 0->23 for white and 23->0 for black
+                    move = new Move(i, toPosition, movetype, player); // Goes 0->23 for white and 23->0 for black
                 }
 
                 if (move.to() < 0 || move.to() > 23) { continue; }
