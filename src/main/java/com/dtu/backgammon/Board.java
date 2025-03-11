@@ -104,18 +104,24 @@ public class Board {
     }
 
     public boolean isValidMove(Move move, Brick player, int roll) {
-        // Check if the move is within bounds
-        // Force reentry before other stones
-        if (!move.isReentry() || !move.isBearingOff()) {
+
+        // Additional check for bearing off
+        if (move.isBearingOff()) {
+            return (player != Brick.WHITE || whiteHomeBoard == maxWhiteHomeBoard) &&
+                    (player != Brick.BLACK || blackHomeBoard == maxBlackHomeBoard);
+        }
+        //Validations rules for normal moves
+        else   {
+            //Check if movement is within bounds
             if (move.to() > 23 || move.to() < 0) {
                 return false;
             }
-            if ((player == Brick.WHITE && barWhite > 0) || (player == Brick.BLACK && barBlack > 0)) {
-                if (!move.isReentry()) {
+            //Check if the player has a stone on the bar
+            if(!move.isReentry()) {
+                if ((player == Brick.WHITE && barWhite > 0) || (player == Brick.BLACK && barBlack > 0)) {
                     return false;
                 }
             }
-
             // Ensure a maximum of 5 stones in one location
             if (board.get(move.to()).count >= 5) {
                 return false;
@@ -126,18 +132,12 @@ public class Board {
             if (toPoint.brick != Brick.NONE && toPoint.brick != player && toPoint.count > 1) {
                 return false;
             }
-
-            // Additional check for bearing off
-            if (move.isBearingOff()) {
-                return (player != Brick.WHITE || whiteHomeBoard == maxWhiteHomeBoard) &&
-                        (player != Brick.BLACK || blackHomeBoard == maxBlackHomeBoard);
-            }
-
+            // Check if move is valid
             if(player == Brick.WHITE && barWhite == 0){
                 return move.to() == move.from() + roll;
 
             }
-
+           // Check if move is valid
             if(player == Brick.BLACK && barBlack == 0){
                 return move.to() == move.from() - roll;
 
