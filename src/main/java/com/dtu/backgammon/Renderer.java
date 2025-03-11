@@ -21,16 +21,22 @@ public class Renderer {
     static String darktick_color = "69;55;15";
     private static void printBoard(Board board) {
         moveCur(0,0);
+        for (int j = 11; j >= 0; j--) { // Print indexes for column
+            if (j == 5) { System.out.print("   "); } // Pad grey bar
+            System.out.print(String.format("%3d", j));
+        }
+
+        System.out.println();
         for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 12; j++) {
-                if (j == 6) { System.out.print(bcol(graybar_color) + "   "); }
+            for (int j = 11; j >= 0; j--) {
+                if (j == 5) { System.out.print(bcol(graybar_color) + "   "); }
                 Brick brick = board.getBrickAt(j, i);
-                System.out.print(bcol(j%2 == 0 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
+                System.out.print(bcol(j%2 == 1 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
             }
             System.out.println();
         }
 
-        moveCur(0,6);
+        moveCur(0,6+1);
         // Print gray bar in the middle of green
         for (int i = 6; i < 9; i++) {
             System.out.print(bcol(backgroundcolor) + "   ".repeat(6));
@@ -38,7 +44,7 @@ public class Renderer {
             System.out.println(bcol(backgroundcolor) + "   ".repeat(6));
         }
 
-        moveCur(0,6+3);
+        moveCur(0,6+3+1);
         for (int i = 4; i >= 0; i--) {
             for (int j = 12; j < 24; j++) {
                 if (j == 18) { System.out.print(bcol(graybar_color) + "   "); }
@@ -48,6 +54,10 @@ public class Renderer {
             System.out.println();
         }
         resetColor();
+        for (int j = 12; j < 24; j++) { // Print indexes for column
+            if (j == 18) { System.out.print("   "); } // Pad grey bar
+            System.out.print(String.format("%3d", j));
+        }
         // Temporary move cursor below board
         moveCur(0, 20);
     }
@@ -76,10 +86,10 @@ public class Renderer {
         
     static String backgroundcolor = "17;125;7";
     private static void setBackgroundColor() {
-        System.out.println(esc + "[m" + bcol(backgroundcolor));
+        System.out.print(esc + "[m" + bcol(backgroundcolor));
     }
     private static void clearScreen(boolean keepColor) {
-        System.out.println((keepColor ? (esc + "[0m") : "" ) + esc + "[2J");
+        System.out.print((keepColor ? (esc + "[0m") : "" ) + esc + "[2J");
     }
     private static String bcol(String rgbcol) {
         return esc + "[48;2;" + rgbcol + "m";
@@ -88,7 +98,7 @@ public class Renderer {
         return esc + "[38;2;" + rgbcol + "m";
     }
     private static void resetColor() {
-        System.out.println(esc + "[0m");
+        System.out.print(esc + "[0m");
     }
     private static void moveCur(int x, int y) {
         System.out.print(esc + String.format("[%d;%dH", y, x));
