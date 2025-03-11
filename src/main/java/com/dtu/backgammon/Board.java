@@ -24,6 +24,10 @@ public class Board {
 
     public List<BoardElement> board;
     public List<Player> players = new ArrayList<Player>();
+
+    public static int WHITE_START = -1;
+    public static int BLACK_START = 24;
+
     public Board() throws Exception {
         board = new ArrayList<BoardElement>(24);
         for (int i = 0; i < 24; i++) {
@@ -102,11 +106,22 @@ public class Board {
 
         List<Move[]> moves = new ArrayList<Move[]>();
         for (List<Integer> diceMove : diceMovesAnyOrder) {
+
             for (int i = 0; i < board.size(); i++) {
                 if (board.get(i).brick == player) { // The current player has bricks to move here
-                    Move move = new Move(i, i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1), Move.MoveType.NORMAL); // Goes 0->23 for white and 23->0 for black
+                    Move move;
+                    if (board.hasBrickInTray(player)) { // Player has brick in the tray and needs to move them out first.
+                        int startPos = player == Brick.BLACK ? Board.BLACK_START : Board.WHITE_START;
+                        int toPosition = startPos + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1); // Calculate the absolut to position for reentry
+                        move = new Move(startPos, toPosition, Move.MoveType.REENTRY);
+                        i = board.size(); // Make sure to break loop if we have a brick in tray.
+                    } else {
+                        int toPosition = i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1);
+                        Move.MoveType movetype = toPosition > 23 || toPosition < 0 ? Move.MoveType.BEARINGOFF : Move.MoveType.NORMAL; // Players can only move in their right direction which means this logic works for either player.
+                        move = new Move(i, toPosition, movetype); // Goes 0->23 for white and 23->0 for black
+                    }
 
-                    if (move.to() > 23 || move.to() < 0) { continue; } // TODO: Implement the logic for bearing off and reentry
+                    if (move.to() > 23 || move.to() < 0) { continue; }
                     if (!this.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
 
                     List<Integer> newDiceMoves = new ArrayList<>(diceMove);
