@@ -32,24 +32,30 @@ public class Board {
         for (int i = 0; i < 24; i++) {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
-        
-        board.get(0).brick = Brick.WHITE;
-        board.get(0).count = 3;
-
-        board.get(2).brick = Brick.BLACK;
-        board.get(2).count = 4;
-
-        board.get(7).brick = Brick.WHITE;
-        board.get(7).count = 2;
-
-        board.get(14).brick = Brick.WHITE;
-        board.get(14).count = 3;
 
         setupPlayers();
+        setupStandardBoard();
     }
     public Board(List<BoardElement> board, List<Player> players) {
         this.board = board; this.players = players;
     }
+
+    private void setupStandardBoard() {
+        setColumn(0, Brick.WHITE, 2);
+        setColumn(11, Brick.WHITE, 5);
+        setColumn(16, Brick.WHITE, 3);
+        setColumn(18, Brick.WHITE, 5);
+        
+        setColumn(23, Brick.BLACK, 2);
+        setColumn(12, Brick.BLACK, 5);
+        setColumn(7, Brick.BLACK, 3);
+        setColumn(5, Brick.BLACK, 5);
+    }
+    private void setColumn(int column, Brick player, int count) {
+        board.get(column).brick = player;
+        board.get(column).count = count;
+    }
+    
 
     private void setupPlayers() throws Exception {
         // Initialize players

@@ -36,7 +36,7 @@ public class Renderer {
             System.out.println();
         }
 
-        moveCur(0,6);
+        moveCur(0,6+1);
         // Print gray bar in the middle of green
         for (int i = 6; i < 9; i++) {
             System.out.print(bcol(backgroundcolor) + "   ".repeat(6));
@@ -44,7 +44,7 @@ public class Renderer {
             System.out.println(bcol(backgroundcolor) + "   ".repeat(6));
         }
 
-        moveCur(0,6+3);
+        moveCur(0,6+3+1);
         for (int i = 4; i >= 0; i--) {
             for (int j = 12; j < 24; j++) {
                 if (j == 18) { System.out.print(bcol(graybar_color) + "   "); }

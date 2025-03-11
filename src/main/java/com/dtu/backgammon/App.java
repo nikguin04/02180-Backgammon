@@ -20,25 +20,16 @@ public class App {
     public static void main(String[] args) throws Exception {
         scanner = new Scanner(System.in);
         Board board = new Board();
-        //Renderer.render(board);
-
-        
-        board.board.get(16).brick = Brick.WHITE;
-        board.board.get(16).count = 3;
-        board.board.get(7).brick = Brick.WHITE;
-        board.board.get(7).count = 2;
-
-        board.board.get(8).brick = Brick.BLACK;
-        board.board.get(8).count = 2;
+        Renderer.render(board);
 
 
-        List<Move[]> actions = board.actions(Brick.BLACK, new LinkedList<>(Arrays.asList( new Integer[] {1,3} )) );
+        /*List<Move[]> actions = board.actions(Brick.BLACK, new LinkedList<>(Arrays.asList( new Integer[] {1,3} )) );
         for (int i = 0; i < actions.size(); i++) {
             System.out.print("[");
             for (int j = 0; j < actions.get(i).length; j++) {
                 System.out.print(actions.get(i)[j].toString() + ", ");
             }
             System.out.println("]");
-        }
+        }*/
     }
 }
