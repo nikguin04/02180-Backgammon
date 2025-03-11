@@ -2,7 +2,6 @@ package com.dtu.backgammon;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -12,7 +11,7 @@ import com.dtu.backgammon.player.Player;
 
 public class Board {
     public enum Brick {
-        NONE,WHITE,BLACK
+        NONE, WHITE, BLACK
     }
     public class BoardElement {
         Brick brick;
@@ -23,9 +22,9 @@ public class Board {
     }
 
     public List<BoardElement> board;
-    public List<Player> players = new ArrayList<Player>();
+    public List<Player> players = new ArrayList<>();
     public Board() throws Exception {
-        board = new ArrayList<BoardElement>(24);
+        board = new ArrayList<>(24);
         for (int i = 0; i < 24; i++) {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
@@ -40,7 +39,7 @@ public class Board {
         // Initialize players
         Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
         for (Brick brick : Brick.class.getEnumConstants()) {
-            if (brick.name() == "NONE") { continue; } // Do not initialize a player as no brick
+            if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
 
             System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
             while (!App.scanner.hasNext(playerPattern)) {
@@ -50,17 +49,11 @@ public class Board {
             String playerType = App.scanner.next(playerPattern);
 
             switch (playerType.toLowerCase()) {
-                case "human":
-                    players.add(new Human(brick));
-                    break;
-                case "ai":
-                    players.add(new AI(brick));
-                    break;
-                default:
-                    throw new Exception("Failed to match input for player type: " + playerType);
+                case "human" -> players.add(new Human(brick));
+                case "ai" -> players.add(new AI(brick));
+                default -> throw new Exception("Failed to match input for player type: " + playerType);
             }
         }
-        
     }
 
     public Brick getBrickAt(int column, int depth) {
@@ -70,7 +63,7 @@ public class Board {
     public boolean isValidMove(Move move, Brick player, int roll) {
         if (move.isBearingOff()) {
             // TODO: check that all stones are on home board
-            return move.from() < roll;
+            return (player == Brick.BLACK ? move.from() : 23 - move.from()) < roll;
         }
         // TODO: Force player to reenter stones from the bar
         BoardElement toPoint = board.get(move.to());
@@ -87,10 +80,9 @@ public class Board {
         board.get(move.to()).count++;
         board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
         if (board.get(move.from()).count == 0) { board.get(move.from()).brick = Brick.NONE; } // Set brick to none if board is empty
-        
     }
-    
-    public List<Move[]> actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves 
+
+    public List<Move[]> actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves
         List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
         if (diceMoves.size() < 2 || diceMoves.get(0) == diceMoves.get(1)) { // All eyes are equal
             diceMovesAnyOrder.add(diceMoves);
@@ -111,7 +103,7 @@ public class Board {
 
                     List<Integer> newDiceMoves = new ArrayList<>(diceMove);
                     newDiceMoves.remove(0);
-                    
+
                     if (newDiceMoves.size() > 0) {
                         Board newBoard = this.clone();
                         newBoard.performMove(move);
@@ -130,14 +122,13 @@ public class Board {
         return moves;
     }
 
-
     @Override
     public Board clone() {
         // Returning a clone of the current object
-        List<BoardElement> boarde = new ArrayList<>();
-        for (BoardElement p : this.board) {boarde.add(p.clone());}
+        List<BoardElement> board = new ArrayList<>();
+        for (BoardElement p : this.board) { board.add(p.clone()); }
         List<Player> players = new ArrayList<>();
-        for (Player p : this.players) {players.add(p);} // NOTE: do not clone this since we can use players as duplicates
-        return new Board(boarde, players);
+        for (Player p : this.players) { players.add(p); } // NOTE: do not clone this since we can use players as duplicates
+        return new Board(board, players);
     }
 }
