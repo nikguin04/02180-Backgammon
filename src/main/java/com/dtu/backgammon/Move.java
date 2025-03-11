@@ -17,6 +17,6 @@ public record Move(int from, int to, MoveType movetype, Brick brick) {
 
     @Override
     public String toString() {
-        return "Move from " + from + " to " + to;
+        return "Move from " + from + " to " + to + " as " + movetype.name();
     }
 }

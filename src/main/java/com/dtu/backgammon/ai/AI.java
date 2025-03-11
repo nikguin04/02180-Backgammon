@@ -41,23 +41,24 @@ public class AI extends Player {
         }
 
         List<Move[]> moves = new ArrayList<>();
-        for (List<Integer> diceMove : diceMovesAnyOrder) {
+        for (List<Integer> diceMove : diceMovesAnyOrder) { // TODO: Make sure to break if no bricks but not all moves are used
             for (int i = 0; i < boardElements.size(); i++) {
-                if (boardElements.get(i).brick != player) { continue; }
-                // The current player has bricks to move here
                 Move move;
-                if (board.hasBrickInTray(player)) { // Player has brick in the tray and needs to move them out first.
+                if (board.hasBrickInBar(player)) { // Player has brick in the tray and needs to move them out first.
                     int startPos = player == Brick.BLACK ? Board.BLACK_START : Board.WHITE_START;
                     int toPosition = startPos + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1); // Calculate the absolut to position for reentry
                     move = new Move(startPos, toPosition, Move.MoveType.REENTRY, player);
                     i = boardElements.size(); // Make sure to break loop if we have a brick in tray.
                 } else {
+                    if (boardElements.get(i).brick != player) { continue; }
+                    // The current player has bricks to move here
+
                     int toPosition = i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1);
                     Move.MoveType movetype = toPosition > 23 || toPosition < 0 ? Move.MoveType.BEARINGOFF : Move.MoveType.NORMAL; // Players can only move in their right direction which means this logic works for either player.
                     move = new Move(i, toPosition, movetype, player); // Goes 0->23 for white and 23->0 for black
                 }
 
-                if (move.to() < 0 || move.to() > 23) { continue; }
+                //if (move.to() < 0 || move.to() > 23) { continue; }
                 if (!board.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
 
                 List<Integer> newDiceMoves = new ArrayList<>(diceMove);
@@ -66,11 +67,15 @@ public class AI extends Player {
                 if (!newDiceMoves.isEmpty()) {
                     Board newBoard = board.clone();
                     newBoard.performMove(move);
-                    List<Move[]> actions = this.actions(board, newDiceMoves);
-                    for (Move[] action : actions) {
-                        List<Move> nestMoves = new ArrayList<>(Arrays.asList(action));
-                        nestMoves.add(0, move);
-                        moves.add(nestMoves.toArray(Move[]::new)); // Add list of new moves at this state to the moves array
+                    List<Move[]> actions = this.actions(newBoard, newDiceMoves);
+                    if (actions.size() == 0) { // We are eiteher done with the game or there are no actions, so return just this move
+                        moves.add( new Move[] {move});
+                    } else { // Add all possible actions to move list
+                        for (Move[] action : actions) {
+                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(action));
+                            nestMoves.add(0, move);
+                            moves.add(nestMoves.toArray(Move[]::new)); // Add list of new moves at this state to the moves array
+                        }
                     }
                 } else {
                     moves.add(new Move[] { move });

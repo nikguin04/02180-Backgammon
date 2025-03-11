@@ -50,11 +50,24 @@ public class Board {
         }
 
         setupPlayers();
-        setupStandardBoard();
-        startGame();
+        //setupStandardBoard();
+        //startGame();
     }
-    public Board(List<BoardElement> board, List<Player> players) {
+    public Board(List<BoardElement> board, List<Player> players,
+        int winTrayWhite,
+        int winTrayBlack,
+        int barWhite,
+        int barBlack,
+        int blackHomeBoard,
+        int whiteHomeBoard
+        ) {
         this.board = board; this.players = players;
+        this.winTrayWhite = winTrayWhite;
+        this.winTrayBlack = winTrayBlack;
+        this.barWhite = barWhite;
+        this.barBlack = barBlack;
+        this.blackHomeBoard = blackHomeBoard;
+        this.whiteHomeBoard = whiteHomeBoard;
     }
 
     private void setupStandardBoard() {
@@ -68,7 +81,7 @@ public class Board {
         setColumn(7, Brick.BLACK, 3);
         setColumn(5, Brick.BLACK, 5);
     }
-    private void setColumn(int column, Brick player, int count) {
+    public void setColumn(int column, Brick player, int count) {
         board.get(column).brick = player;
         board.get(column).count = count;
     }
@@ -107,8 +120,8 @@ public class Board {
         return (board.get(column).count > depth) ? board.get(column).brick : Brick.NONE;
     }
 
-    public boolean hasBrickInTray(Brick brick) {
-        return (brick == Brick.WHITE) ? winTrayWhite > 0 : winTrayBlack > 0;
+    public boolean hasBrickInBar(Brick brick) {
+        return (brick == Brick.WHITE) ? barWhite > 0 : barBlack > 0;
 
     }
 
@@ -116,8 +129,8 @@ public class Board {
 
         // Additional check for bearing off
         if (move.isBearingOff()) {
-            return (player != Brick.WHITE || whiteHomeBoard == maxWhiteHomeBoard) &&
-                    (player != Brick.BLACK || blackHomeBoard == maxBlackHomeBoard);
+            return (player != Brick.WHITE || whiteHomeBoard >= maxWhiteHomeBoard) &&
+                    (player != Brick.BLACK || blackHomeBoard >= maxBlackHomeBoard);
         }
         //Validations rules for normal moves
         else   {
@@ -183,7 +196,7 @@ public class Board {
         }
 
         else {
-            if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count < 6){
+            if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count < 6){ // TODO: Account for already in homeboard
                 whiteHomeBoard++;
             }
             else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count > 17){
@@ -212,10 +225,11 @@ public class Board {
     @Override
     public Board clone() {
         // Returning a clone of the current object
+
         List<BoardElement> board = new ArrayList<>();
         for (BoardElement p : this.board) { board.add(p.clone()); }
         List<Player> players = new ArrayList<>();
         for (Player p : this.players) { players.add(p); } // NOTE: do not clone this since we can use players as duplicates
-        return new Board(board, players);
+        return new Board(board, players, winTrayWhite, winTrayBlack, barWhite, barBlack, blackHomeBoard, whiteHomeBoard);
     }
 }
