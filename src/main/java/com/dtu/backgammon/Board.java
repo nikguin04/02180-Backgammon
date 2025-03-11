@@ -74,9 +74,12 @@ public class Board {
     }
 
     private void setupDebugBoard() {
+        whiteHomeBoard = 15;
+        blackHomeBoard = 15;
         setColumn(0, Brick.WHITE, 2);
         setColumn(1, Brick.WHITE, 2);
         setColumn(4, Brick.BLACK, 1);
+        setColumn(8, Brick.BLACK, 1);
     }
 
     private void setupStandardBoard() {
@@ -223,11 +226,11 @@ public class Board {
         }
 
         else {
-            if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count < 6){ // TODO: Account for already in homeboard
-                whiteHomeBoard++;
-            }
-            else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count > 17){
+            if (board.get(move.from()).brick == Brick.BLACK && move.to() <= 5 && move.from() > 5){ // TODO: Account for already in homeboard
                 blackHomeBoard++;
+            }
+            else if (board.get(move.from()).brick == Brick.WHITE && move.to() >= 18 && move.from() < 18){
+                whiteHomeBoard++;
             }
             if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).brick == Brick.BLACK && board.get(move.to()).count ==1){
                 barBlack++;

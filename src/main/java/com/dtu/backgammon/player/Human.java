@@ -44,7 +44,7 @@ public class Human extends Player {
                 String[] positions = moveInput.split(" ");
                 int from = Integer.parseInt(positions[0]);
                 if (from >= 0 && from < 24) { 
-                    return new Move(from, -1, Move.MoveType.BEARINGOFF, brick);
+                    return new Move(from, brick == Brick.WHITE ? 24 : -1, Move.MoveType.BEARINGOFF, brick); // To is either 24 or -1, so we can calculate the roll (from -> to) properly from both side
                 }
 
             } else if(Pattern.matches("B \\d+", moveInput)) {
