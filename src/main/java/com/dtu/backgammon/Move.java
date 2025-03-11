@@ -15,7 +15,7 @@ public record Move(int from, int to, MoveType movetype, Brick brick) {
         return movetype == MoveType.BEARINGOFF;
     }
 
-    public int getRoll() {
+    public int getRoll() { // Roll should fit both move out for black and white and win stuff
         return Math.abs(from-to);
     }
     @Override

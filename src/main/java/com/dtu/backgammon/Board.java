@@ -52,7 +52,8 @@ public class Board {
         }
 
         setupPlayers();
-        setupStandardBoard();
+        //setupStandardBoard();
+        setupDebugBoard();
         startGame();
     }
     public Board(List<BoardElement> board, List<Player> players,
@@ -70,6 +71,12 @@ public class Board {
         this.barBlack = barBlack;
         this.blackHomeBoard = blackHomeBoard;
         this.whiteHomeBoard = whiteHomeBoard;
+    }
+
+    private void setupDebugBoard() {
+        setColumn(0, Brick.WHITE, 2);
+        setColumn(1, Brick.WHITE, 2);
+        setColumn(4, Brick.BLACK, 1);
     }
 
     private void setupStandardBoard() {
@@ -222,7 +229,7 @@ public class Board {
             else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count > 17){
                 blackHomeBoard++;
             }
-            else if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).brick == Brick.BLACK && board.get(move.to()).count ==1){
+            if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).brick == Brick.BLACK && board.get(move.to()).count ==1){
                 barBlack++;
                 board.get(move.to()).count--;
                 board.get(move.to()).brick = Brick.NONE;
