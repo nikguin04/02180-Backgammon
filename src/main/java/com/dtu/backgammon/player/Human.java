@@ -51,7 +51,7 @@ public class Human extends Player {
                 String[] positions = moveInput.split(" ");
                 int to = Integer.parseInt(positions[1]);
                 if (to >= 0 && to < 24) { 
-                    return new Move(-1, to, Move.MoveType.REENTRY, brick);
+                    return new Move(brick == Brick.WHITE ? -1 : 24, to, Move.MoveType.REENTRY, brick); // From is either -1 or 24, so we can calculate the roll (from -> to) properly from both side
                     
                 }
             } else {
