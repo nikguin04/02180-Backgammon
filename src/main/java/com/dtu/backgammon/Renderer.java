@@ -29,7 +29,11 @@ public class Renderer {
         System.out.println();
         for (int i = 0; i < 5; i++) {
             for (int j = 11; j >= 0; j--) {
-                if (j == 5) { System.out.print(bcol(graybar_color) + "   "); }
+                if (j == 5) { // Print the white bar
+                    boolean brickInBar = board.barWhite > i;
+                    System.out.print(bcol(graybar_color) + (brickInBar ? fcol(white_color) + " \u25CF " : "   "));
+                    resetColor();
+                }
                 Brick brick = board.getBrickAt(j, i);
                 System.out.print(bcol(j%2 == 1 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
             }
@@ -47,7 +51,11 @@ public class Renderer {
         moveCur(0,6+3+1);
         for (int i = 4; i >= 0; i--) {
             for (int j = 12; j < 24; j++) {
-                if (j == 18) { System.out.print(bcol(graybar_color) + "   "); }
+                if (j == 18) { // Print the black bar
+                    boolean brickInBar = board.barBlack > i;
+                    System.out.print(bcol(graybar_color) + (brickInBar ? fcol(black_color) + " \u25CF " : "   "));
+                    resetColor();
+                }
                 Brick brick = board.getBrickAt(j, i);
                 System.out.print(bcol(j%2 == 1 ? lighttick_color : darktick_color) + getBrickPrintStr(brick));
             }

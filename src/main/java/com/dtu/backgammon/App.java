@@ -21,13 +21,13 @@ public class App {
     public static void main(String[] args) throws Exception {
         scanner = new Scanner(System.in);
         Board board = new Board();
-        //Renderer.render(board);
+        Renderer.render(board);
 
         /*board.whiteHomeBoard = 15;
         board.setColumn(21, Brick.WHITE, 1);
         board.setColumn(22, Brick.WHITE, 1);*/
 
-        board.barWhite = 1;
+        /*board.barWhite = 1;
         board.setColumn(21, Brick.WHITE, 1);
         board.setColumn(9, Brick.WHITE, 3);
         
@@ -40,6 +40,6 @@ public class App {
                 System.out.print(actions.get(i)[j].toString() + ", ");
             }
             System.out.println("]");
-        }
+        }*/
     }
 }
