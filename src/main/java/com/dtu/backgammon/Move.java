@@ -15,6 +15,9 @@ public record Move(int from, int to, MoveType movetype, Brick brick) {
         return movetype == MoveType.BEARINGOFF;
     }
 
+    public int getRoll() {
+        return Math.abs(from-to);
+    }
     @Override
     public String toString() {
         return "Move from " + from + " to " + to + " as " + movetype.name();

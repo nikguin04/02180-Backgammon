@@ -17,7 +17,7 @@ public class AI extends Player {
     }
 
     @Override
-    public Move getMove() {
+    public Move getMove(List<Integer> roll) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMove'");
     }

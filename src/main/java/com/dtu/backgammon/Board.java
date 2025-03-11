@@ -1,8 +1,10 @@
 package com.dtu.backgammon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.dtu.backgammon.ai.AI;
 import com.dtu.backgammon.player.Human;
@@ -50,8 +52,8 @@ public class Board {
         }
 
         setupPlayers();
-        //setupStandardBoard();
-        //startGame();
+        setupStandardBoard();
+        startGame();
     }
     public Board(List<BoardElement> board, List<Player> players,
         int winTrayWhite,
@@ -89,7 +91,24 @@ public class Board {
     private void startGame() {
         while (true) { // TODO: Replace this with a winning condition
             for (Player p : players) {
-                p.getMove();
+                Renderer.render(this);
+                Dice d = new Dice();
+                int[] roll = d.rollDice();
+                List<Integer> rollList = Arrays.stream(roll).boxed().collect(Collectors.toList());
+                List<Move> moveList = new ArrayList<>();
+                while (rollList.size() > 0) {
+                    Move move = p.getMove( rollList );
+                    if (!rollList.contains(Integer.valueOf(move.getRoll()))) {
+                        continue;
+                    }
+                    boolean valid = this.isValidMove(move, p.brick, move.getRoll());
+                    if (valid) {
+                        moveList.add(move);
+                        rollList.remove(Integer.valueOf(move.getRoll()));
+                        this.performMove(move);
+                    }
+                }
+
             }
 
         }
@@ -114,6 +133,7 @@ public class Board {
                 default -> throw new Exception("Failed to match input for player type: " + playerType);
             }
         }
+        App.scanner.nextLine(); // Flush scanner
     }
 
     public Brick getBrickAt(int column, int depth) {

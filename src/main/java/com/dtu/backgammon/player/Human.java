@@ -1,7 +1,10 @@
 package com.dtu.backgammon.player;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.dtu.backgammon.App;
 import com.dtu.backgammon.Board.Brick;
@@ -14,11 +17,12 @@ public class Human extends Player {
     }
 
     @Override
-    public Move getMove() {
+    public Move getMove(List<Integer> roll) {
         Scanner scanner = App.scanner;
         String moveInput;
 
         while (true) {
+            System.out.println(brick.name() + " To move with " + roll.toString());
             System.out.println("Enter your move (e.g., 'from to'): ");
             moveInput = scanner.nextLine();
 

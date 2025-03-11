@@ -21,7 +21,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         scanner = new Scanner(System.in);
         Board board = new Board();
-        Renderer.render(board);
+        //Renderer.render(board);
 
         /*board.whiteHomeBoard = 15;
         board.setColumn(21, Brick.WHITE, 1);

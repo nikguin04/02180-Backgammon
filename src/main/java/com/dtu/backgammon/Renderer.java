@@ -67,7 +67,7 @@ public class Renderer {
             System.out.print(String.format("%3d", j));
         }
         // Temporary move cursor below board
-        moveCur(0, 20);
+        moveCur(0, 16);
     }
 
     private static void printPlayers(List<Player> players) {
@@ -75,6 +75,7 @@ public class Renderer {
         for (int i = 0; i < players.size(); i++) {
             System.out.print((i>0 ? " Vs. " : "") + players.get(i).getName());
         }
+        System.out.println();
     }
 
     static String white_color = "255;255;255";
