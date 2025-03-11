@@ -10,6 +10,23 @@ import com.dtu.backgammon.player.Human;
 import com.dtu.backgammon.player.Player;
 
 public class Board {
+
+    int winTrayWhite = 0;
+
+    int winTrayBlack = 0;
+
+    int barWhite = 0;
+
+    int barBlack = 0;
+
+    int blackHomeBoard = 0;
+
+    int whiteHomeBoard = 0;
+
+    int maxBlackHomeBoard =  15;
+
+    int maxWhiteHomeBoard = 15;
+
     public enum Brick {
         NONE, WHITE, BLACK
     }
@@ -60,26 +77,106 @@ public class Board {
         return (board.get(column).count > depth) ? board.get(column).brick : Brick.NONE;
     }
 
-    public boolean isValidMove(Move move, Brick player, int roll) {
-        if (move.isBearingOff()) {
-            // TODO: check that all stones are on home board
-            return (player == Brick.BLACK ? move.from() : 23 - move.from()) < roll;
-        }
-        // TODO: Force player to reenter stones from the bar
-        BoardElement toPoint = board.get(move.to());
-        if (toPoint.brick != Brick.NONE && toPoint.brick != player && toPoint.count > 1) {
-            return false;
-        }
-        // TODO: Other edge cases like the one described in https://en.wikipedia.org/wiki/Backgammon#Bearing_off?
-        return true;
+    public boolean hasBrickInTray(Brick brick) {
+        return (brick == Brick.WHITE) ? winTrayWhite > 0 : winTrayBlack > 0;
+
     }
 
-    // Note, does not check validity!
+    public boolean isValidMove(Move move, Brick player, int roll) {
+        // Check if the move is within bounds
+        // Force reentry before other stones
+        if (!move.isReentry() || !move.isBearingOff()) {
+            if (move.to() > 23 || move.to() < 0) {
+                return false;
+
+            }
+            if(player == Brick.WHITE && barWhite == 0){
+                return move.to() == move.from() + roll;
+
+            }
+
+            if(player == Brick.BLACK && barBlack == 0){
+                return move.to() == move.from() - roll;
+
+            }
+            if ((player == Brick.WHITE && barWhite > 0) || (player == Brick.BLACK && barBlack > 0)) {
+                if (!move.isReentry()) {
+                    return false;
+                }
+            }
+
+            // Ensure a maximum of 5 stones in one location
+            if (board.get(move.to()).count >= 5) {
+                return false;
+            }
+
+            // Prevent moving a stone to a location where the opposite color has 2 or more stones
+            BoardElement toPoint = board.get(move.to());
+            if (toPoint.brick != Brick.NONE && toPoint.brick != player && toPoint.count > 1) {
+                return false;
+            }
+
+            // Additional check for bearing off
+            if (move.isBearingOff()) {
+                return (player != Brick.WHITE || whiteHomeBoard == maxWhiteHomeBoard) &&
+                        (player != Brick.BLACK || blackHomeBoard == maxBlackHomeBoard);
+            }
+        }
+        return true;
+    }
+    // Note, does not check
+        // validity!
     public void performMove(Move move) {
-        board.get(move.from()).count--;
-        board.get(move.to()).count++;
-        board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
-        if (board.get(move.from()).count == 0) { board.get(move.from()).brick = Brick.NONE; } // Set brick to none if board is empty
+        if (move.isBearingOff()) {
+            board.get(move.from()).count--;
+            if (board.get(move.from()).count == 0) {
+                board.get(move.from()).brick = Brick.NONE;
+            }
+            if (board.get(move.from()).brick == Brick.WHITE) {
+                winTrayWhite++;
+                maxWhiteHomeBoard--;
+            } else if (board.get(move.from()).brick == Brick.BLACK) {
+                winTrayBlack++;
+                maxBlackHomeBoard--;
+            }
+        }
+        else if (move.isReentry()) {
+            if (board.get(move.from()).brick == Brick.WHITE) {
+                barWhite--;
+                board.get(move.to()).count++;
+                board.get(move.to()).brick = Brick.WHITE;
+            } else if (board.get(move.from()).brick == Brick.BLACK) {
+                barBlack--;
+                board.get(move.to()).count++;
+                board.get(move.to()).brick = Brick.BLACK;
+            }
+        }
+
+        else {
+            if (board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count < 6){
+                whiteHomeBoard++;
+            }
+            else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count > 17){
+                blackHomeBoard++;
+            }
+            else if (board.get(move.from()).brick == Brick.WHITE && board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).count ==1){
+                barBlack++;
+                board.get(move.to()).count--;
+                board.get(move.to()).brick = Brick.NONE;
+            }
+            else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.from()).brick == Brick.WHITE && board.get(move.to()).count ==1){
+                barWhite++;
+                board.get(move.to()).count--;
+                board.get(move.to()).brick = Brick.NONE;
+            }
+            board.get(move.from()).count--;
+            board.get(move.to()).count++;
+            board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
+            if (board.get(move.from()).count == 0) {
+                board.get(move.from()).brick = Brick.NONE;
+            } // Set brick to none if board is empty
+        }
+
     }
 
     public List<Move[]> actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves
