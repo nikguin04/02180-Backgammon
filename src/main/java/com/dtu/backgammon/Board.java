@@ -1,11 +1,10 @@
 package com.dtu.backgammon;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.dtu.backgammon.player.AI;
+import com.dtu.backgammon.ai.AI;
 import com.dtu.backgammon.player.Human;
 import com.dtu.backgammon.player.Player;
 
@@ -45,7 +44,7 @@ public class Board {
         setColumn(11, Brick.WHITE, 5);
         setColumn(16, Brick.WHITE, 3);
         setColumn(18, Brick.WHITE, 5);
-        
+
         setColumn(23, Brick.BLACK, 2);
         setColumn(12, Brick.BLACK, 5);
         setColumn(7, Brick.BLACK, 3);
@@ -55,7 +54,7 @@ public class Board {
         board.get(column).brick = player;
         board.get(column).count = count;
     }
-    
+
 
     private void setupPlayers() throws Exception {
         // Initialize players
@@ -103,7 +102,6 @@ public class Board {
         board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
         if (board.get(move.from()).count == 0) { board.get(move.from()).brick = Brick.NONE; } // Set brick to none if board is empty
     }
-    
 
     @Override
     public Board clone() {
