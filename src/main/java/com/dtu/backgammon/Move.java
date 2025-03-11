@@ -1,24 +1,25 @@
 package com.dtu.backgammon;
 
-public class Move {
-    private int from;
-    private int to;
+import com.dtu.backgammon.Board.Brick;
 
-    public Move(int from, int to) {
-        this.from = from;
-        this.to = to;
+public record Move(int from, int to, MoveType movetype, Brick brick) {
+    public enum MoveType {
+        NORMAL,BEARINGOFF,REENTRY
     }
 
-    public int getFrom() {
-        return from;
+    public boolean isReentry() {
+        return movetype == MoveType.REENTRY;
     }
 
-    public int getTo() {
-        return to;
+    public boolean isBearingOff() {
+        return movetype == MoveType.BEARINGOFF;
     }
 
+    public int getRoll() { // Roll should fit both move out for black and white and win stuff
+        return Math.abs(from-to);
+    }
     @Override
     public String toString() {
-        return "Move from " + from + " to " + to;
+        return "Move from " + from + " to " + to + " as " + movetype.name();
     }
 }

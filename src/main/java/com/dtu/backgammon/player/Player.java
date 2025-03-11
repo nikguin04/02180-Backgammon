@@ -1,13 +1,16 @@
 package com.dtu.backgammon.player;
 
+import java.util.List;
+
 import com.dtu.backgammon.Board.Brick;
+import com.dtu.backgammon.Move;
 
 public abstract class Player {
-    Brick brick;
+    final public Brick brick;
     public Player(Brick brick) {
         this.brick = brick;
     }
 
-    public abstract void getMove();
+    public abstract Move getMove(List<Integer> roll);
     public abstract String getName();
 }
