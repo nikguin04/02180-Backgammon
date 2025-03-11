@@ -14,8 +14,8 @@ public class Board {
         NONE, WHITE, BLACK
     }
     public class BoardElement {
-        Brick brick;
-        int count;
+        public Brick brick;
+        public int count;
         public BoardElement(Brick brick, int count) { this.brick = brick; this.count = count; }
         @Override
         public BoardElement clone() { return new BoardElement(brick, count); }
@@ -23,6 +23,10 @@ public class Board {
 
     public List<BoardElement> board;
     public List<Player> players = new ArrayList<>();
+
+    public static int WHITE_START = -1;
+    public static int BLACK_START = 24;
+
     public Board() throws Exception {
         board = new ArrayList<>(24);
         for (int i = 0; i < 24; i++) {
@@ -81,46 +85,7 @@ public class Board {
         board.get(move.to()).brick = board.get(move.from()).brick; // Set new brick to old brick
         if (board.get(move.from()).count == 0) { board.get(move.from()).brick = Brick.NONE; } // Set brick to none if board is empty
     }
-
-    public List<Move[]> actions(Brick player, List<Integer> diceMoves) { // This returns an array of some amount of moves to perform. This means that the return in ALL possible moves
-        List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
-        if (diceMoves.size() < 2 || diceMoves.get(0) == diceMoves.get(1)) { // All eyes are equal
-            diceMovesAnyOrder.add(diceMoves);
-        } else {
-            // Scuffed way of reversing dice moves
-            diceMovesAnyOrder.add(new ArrayList<>( Arrays.asList(new Integer[] {diceMoves.get(0), diceMoves.get(1)}) ));
-            diceMovesAnyOrder.add(new ArrayList<>( Arrays.asList(new Integer[] {diceMoves.get(1), diceMoves.get(0)}) ));
-        }
-
-        List<Move[]> moves = new ArrayList<Move[]>();
-        for (List<Integer> diceMove : diceMovesAnyOrder) {
-            for (int i = 0; i < board.size(); i++) {
-                if (board.get(i).brick == player) { // The current player has bricks to move here
-                    Move move = new Move(i, i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1), Move.MoveType.NORMAL); // Goes 0->23 for white and 23->0 for black
-
-                    if (move.to() > 23 || move.to() < 0) { continue; } // TODO: Implement the logic for bearing off and reentry
-                    if (!this.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
-
-                    List<Integer> newDiceMoves = new ArrayList<>(diceMove);
-                    newDiceMoves.remove(0);
-
-                    if (newDiceMoves.size() > 0) {
-                        Board newBoard = this.clone();
-                        newBoard.performMove(move);
-                        List<Move[]> actions = newBoard.actions(player, newDiceMoves);
-                        for (int j = 0; j < actions.size(); j++) {
-                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(actions.get(j)));
-                            nestMoves.add(0, move);
-                            moves.add( nestMoves.toArray(Move[]::new) ); // Add list of new moves at this state to the moves array
-                        }
-                    } else {
-                        moves.add(new Move[] { move });
-                    }
-                }
-            }
-        }
-        return moves;
-    }
+    
 
     @Override
     public Board clone() {
