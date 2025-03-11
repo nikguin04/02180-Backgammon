@@ -32,7 +32,7 @@ public class Human extends Player {
                 // Validate the positions
                 if (from >= 0 && from < 24 && to >= 0 && to < 24) {
                     // Create and store the move
-                    Move move = new Move(from, to);
+                    Move move = new Move(from, to, Move.MoveType.NORMAL);
                     System.out.println(move);
                     break;
                 } else {

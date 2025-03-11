@@ -104,7 +104,7 @@ public class Board {
         for (List<Integer> diceMove : diceMovesAnyOrder) {
             for (int i = 0; i < board.size(); i++) {
                 if (board.get(i).brick == player) { // The current player has bricks to move here
-                    Move move = new Move(i, i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1)); // Goes 0->23 for white and 23->0 for black
+                    Move move = new Move(i, i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1), Move.MoveType.NORMAL); // Goes 0->23 for white and 23->0 for black
 
                     if (move.to() > 23 || move.to() < 0) { continue; } // TODO: Implement the logic for bearing off and reentry
                     if (!this.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid

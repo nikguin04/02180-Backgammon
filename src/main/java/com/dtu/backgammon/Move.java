@@ -1,12 +1,17 @@
 package com.dtu.backgammon;
 
-public record Move(int from, int to) {
+
+public record Move(int from, int to, MoveType movetype) {
+    public enum MoveType {
+        NORMAL,BEARINGOFF,REENTRY
+    }
+
     public boolean isReentry() {
-        return from == -1;
+        return movetype == MoveType.REENTRY;
     }
 
     public boolean isBearingOff() {
-        return to == -1;
+        return movetype == MoveType.BEARINGOFF;
     }
 
     @Override
