@@ -51,6 +51,7 @@ public class Board {
 
         setupPlayers();
         setupStandardBoard();
+        startGame();
     }
     public Board(List<BoardElement> board, List<Player> players) {
         this.board = board; this.players = players;
@@ -71,7 +72,15 @@ public class Board {
         board.get(column).brick = player;
         board.get(column).count = count;
     }
+    
+    private void startGame() {
+        while (true) { // TODO: Replace this with a winning condition
+            for (Player p : players) {
+                p.getMove();
+            }
 
+        }
+    }
 
     private void setupPlayers() throws Exception {
         // Initialize players

@@ -14,7 +14,7 @@ public class Human extends Player {
     }
 
     @Override
-    public void getMove() {
+    public Move getMove() {
         Scanner scanner = App.scanner;
         String moveInput;
 
@@ -29,12 +29,12 @@ public class Human extends Player {
                 int from = Integer.parseInt(positions[0]);
                 int to = Integer.parseInt(positions[1]);
 
+                // TODO: Implement input for bering off and reentry
                 // Validate the positions
-                if (from >= 0 && from < 24 && to >= 0 && to < 24) {
+                if (from >= 0 && from < 24 && to >= 0 && to < 24) { 
                     // Create and store the move
                     Move move = new Move(from, to, Move.MoveType.NORMAL);
-                    System.out.println(move);
-                    break;
+                    return move;
                 } else {
                     System.out.println("Invalid move. Positions must be between 0 and 23.");
                 }
