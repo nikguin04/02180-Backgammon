@@ -52,8 +52,8 @@ public class Board {
         }
 
         setupPlayers();
-        //setupStandardBoard();
-        setupDebugBoard();
+        setupStandardBoard();
+        //setupDebugBoard();
         startGame();
     }
     public Board(List<BoardElement> board, List<Player> players,
