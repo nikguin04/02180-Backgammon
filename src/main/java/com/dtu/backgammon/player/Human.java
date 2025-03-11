@@ -40,11 +40,13 @@ public class Human extends Player {
                     Move move = new Move(from, to, Move.MoveType.NORMAL, brick);
                     return move;
                 }
-            } else if (Pattern.matches("\\d+ W", moveInput)) {
+            } else if (Pattern.matches("\\d+ W \\d+", moveInput)) {
                 String[] positions = moveInput.split(" ");
                 int from = Integer.parseInt(positions[0]);
-                if (from >= 0 && from < 24) { 
-                    return new Move(from, brick == Brick.WHITE ? 24 : -1, Move.MoveType.BEARINGOFF, brick); // To is either 24 or -1, so we can calculate the roll (from -> to) properly from both side
+                int windice = Integer.parseInt(positions[2]);
+                int weighed_to = brick == Brick.WHITE ? from+windice : from-windice; // Weighed to so dice numbers actually make sense in validation
+                if (from >= 0 && from < 24 && (weighed_to > 23 || weighed_to < 0) ) { 
+                    return new Move(from, weighed_to, Move.MoveType.BEARINGOFF, brick); // To is either 24 or -1, so we can calculate the roll (from -> to) properly from both side
                 }
 
             } else if(Pattern.matches("B \\d+", moveInput)) {

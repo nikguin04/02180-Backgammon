@@ -250,6 +250,7 @@ public class Board {
             } // Set brick to none if board is empty
         }
 
+        Renderer.render(this); // Always render after a move :)
     }
 
     @Override
