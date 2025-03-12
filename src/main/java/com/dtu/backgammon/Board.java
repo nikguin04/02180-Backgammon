@@ -116,13 +116,17 @@ public class Board {
         boolean gameOver = false; // Flag to track if the game is over
 
         while (!gameOver) { // Outer loop will run until the game is over
+            players:
             for (Player p : players) {
                 Renderer.render(this);
                 Dice d = new Dice();
                 int[] roll = d.rollDice();
                 List<Integer> rollList = Arrays.stream(roll).boxed().collect(Collectors.toList());
                 List<Move> moveList = new ArrayList<>();
+
                 while (rollList.size() > 0) {
+                    if (actions(rollList,p.brick).isEmpty()){ continue players;}
+
                     Move move = p.getMove(this, rollList);
                     if (!rollList.contains(Integer.valueOf(move.getRoll()))) {
                         continue;
@@ -311,4 +315,62 @@ public class Board {
             return true ;}
         return false;
     }
+
+
+    public List<Move[]> actions(List<Integer> diceMoves, Brick player) {
+        List<BoardElement> boardElements = this.board;
+        List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
+        if (diceMoves.size() < 2 || (int) diceMoves.get(0) == diceMoves.get(1)) { // All eyes are equal
+            diceMovesAnyOrder.add(diceMoves);
+        } else {
+            // Scuffed way of reversing dice moves
+            diceMovesAnyOrder.add(List.of(diceMoves.get(0), diceMoves.get(1)));
+            diceMovesAnyOrder.add(List.of(diceMoves.get(1), diceMoves.get(0)));
+        }
+
+        List<Move[]> moves = new ArrayList<>();
+        for (List<Integer> diceMove : diceMovesAnyOrder) { // TODO: Make sure to break if no bricks but not all moves are used
+            for (int i = 0; i < boardElements.size(); i++) {
+                Move move;
+                if (this.hasBrickInBar(player)) { // Player has brick in the tray and needs to move them out first.
+                    int startPos = player == Brick.BLACK ? Board.BLACK_START : Board.WHITE_START;
+                    int toPosition = startPos + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1); // Calculate the absolut to position for reentry
+                    move = new Move(startPos, toPosition, Move.MoveType.REENTRY, player);
+                    i = boardElements.size(); // Make sure to break loop if we have a brick in tray.
+                } else {
+                    if (boardElements.get(i).brick != player) { continue; }
+                    // The current player has bricks to move here
+
+                    int toPosition = i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1);
+                    Move.MoveType movetype = toPosition > 23 || toPosition < 0 ? Move.MoveType.BEARINGOFF : Move.MoveType.NORMAL; // Players can only move in their right direction which means this logic works for either player.
+                    move = new Move(i, toPosition, movetype, player); // Goes 0->23 for white and 23->0 for black
+                }
+
+
+                if (!this.isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
+
+                List<Integer> newDiceMoves = new ArrayList<>(diceMove);
+                newDiceMoves.remove(0);
+
+                if (!newDiceMoves.isEmpty()) {
+                    Board newBoard = this.clone();
+                    newBoard.performMove(move);
+                    List<Move[]> actions = this.actions(newDiceMoves, player);
+                    if (actions.size() == 0) { // We are either done with the game or there are no actions, so return just this move
+                        moves.add( new Move[] {move});
+                    } else { // Add all possible actions to move list
+                        for (Move[] action : actions) {
+                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(action));
+                            nestMoves.add(0, move);
+                            moves.add(nestMoves.toArray(Move[]::new)); // Add list of new moves at this state to the moves array
+                        }
+                    }
+                } else {
+                    moves.add(new Move[] { move });
+                }
+            }
+        }
+        return moves;
+    }
+
 }
