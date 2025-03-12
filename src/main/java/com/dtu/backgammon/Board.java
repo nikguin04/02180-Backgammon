@@ -111,9 +111,11 @@ public class Board {
         board.get(column).brick = player;
         board.get(column).count = count;
     }
-    
+
     private void startGame() {
-        while (true) { // TODO: Replace this with a winning condition
+        boolean gameOver = false; // Flag to track if the game is over
+
+        while (!gameOver) { // Outer loop will run until the game is over
             for (Player p : players) {
                 Renderer.render(this);
                 Dice d = new Dice();
@@ -131,12 +133,20 @@ public class Board {
                         rollList.remove(Integer.valueOf(move.getRoll()));
                         this.performMove(move);
                     }
+
+                    // Check if the game is over and set the flag
+                    if (isGameOver()) {
+                        gameOver = true; // Set the flag to true to break the outer loop
+                        break; // Break the inner loop
+                    }
                 }
-
+                if (gameOver) {
+                    break; // Break the outer loop if the game is over
+                }
             }
-
         }
     }
+
 
     private void setupPlayers() throws Exception {
         // Initialize players
@@ -288,5 +298,17 @@ public class Board {
         List<Player> players = new ArrayList<>();
         for (Player p : this.players) { players.add(p); } // NOTE: do not clone this since we can use players as duplicates
         return new Board(board, players, winTrayWhite, winTrayBlack, barWhite, barBlack, blackHomeBoard, whiteHomeBoard);
+    }
+
+    public boolean isGameOver(){
+        if (winTrayWhite==15){
+            System.out.println("Congratulations White, you won the Game!!!");
+            return true ;
+        }
+        else if (winTrayBlack==15){
+            System.out.println("Congratulations Black, you won the Game!!!");
+
+            return true ;}
+        return false;
     }
 }
