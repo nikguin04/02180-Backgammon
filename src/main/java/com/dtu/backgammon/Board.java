@@ -92,6 +92,20 @@ public class Board {
         setColumn(12, Brick.BLACK, 5);
         setColumn(7, Brick.BLACK, 3);
         setColumn(5, Brick.BLACK, 5);
+
+        // Count initial checkers in home board
+        for (int i = 0; i <= 5; i++) { // Black home board
+            if (board.get(i).brick == Brick.BLACK) {
+                blackHomeBoard += board.get(i).count;
+            }
+        }
+        for (int i = 18; i <= 23; i++) { // White home board
+            if (board.get(i).brick == Brick.WHITE) {
+                whiteHomeBoard += board.get(i).count;
+            }
+        }
+
+
     }
     public void setColumn(int column, Brick player, int count) {
         board.get(column).brick = player;
@@ -236,11 +250,23 @@ public class Board {
                 barBlack++;
                 board.get(move.to()).count--;
                 board.get(move.to()).brick = Brick.NONE;
+
+                // If hit piece was in the black home board, decrease count
+                if (move.to() <= 5 ) {
+                    blackHomeBoard--;
+                }
+
             }
             else if (board.get(move.from()).brick == Brick.BLACK && board.get(move.to()).brick == Brick.WHITE && board.get(move.to()).count ==1){
                 barWhite++;
                 board.get(move.to()).count--;
                 board.get(move.to()).brick = Brick.NONE;
+
+                // If hit piece was in the white home board, decrease count
+                if (move.to() >= 18) {
+                    whiteHomeBoard--;
+                }
+
             }
             board.get(move.from()).count--;
             board.get(move.to()).count++;
