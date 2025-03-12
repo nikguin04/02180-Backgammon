@@ -47,37 +47,24 @@ public class Board {
         }
 
         setupPlayers();
-        setupStandardBoard();
-        //setupDebugBoard();
+        //setupStandardBoard();
+        setupDebugBoard();
         startGame();
     }
 
-    public Board(List<BoardElement> board, List<Player> players,
-        int winTrayWhite,
-        int winTrayBlack,
-        int barWhite,
-        int barBlack,
-        int homeBoardWhite,
-        int homeBoardBlack
-    ) {
+    public Board(List<BoardElement> board, List<Player> players) {
         this.board = board;
         this.players = players;
-        this.winTrayWhite = winTrayWhite;
-        this.winTrayBlack = winTrayBlack;
-        this.barWhite = barWhite;
-        this.barBlack = barBlack;
-        this.homeBoardWhite = homeBoardWhite;
-        this.homeBoardBlack = homeBoardBlack;
     }
 
     private void setupDebugBoard() {
-        homeBoardWhite = 1;
+        homeBoardWhite = 2;
         homeBoardBlack = 1;
-        winTrayWhite = 14;
+        winTrayWhite = 13;
         winTrayBlack = 14;
-        maxHomeBoardWhite = 1;
+        maxHomeBoardWhite = 2;
         maxHomeBoardBlack = 1;
-        setColumn(23, Brick.WHITE, 1);
+        setColumn(23, Brick.WHITE, 2);
         setColumn(0, Brick.BLACK, 1);
     }
 
@@ -175,8 +162,7 @@ public class Board {
     public boolean isValidMove(Move move, Brick player, int roll) {
         // Additional check for bearing off
         if (move.isBearingOff()) {
-            return (player != Brick.WHITE || homeBoardWhite >= maxHomeBoardWhite) &&
-                (player != Brick.BLACK || homeBoardBlack >= maxHomeBoardBlack);
+            return player == Brick.WHITE ? homeBoardWhite >= maxHomeBoardWhite : homeBoardBlack >= maxHomeBoardBlack;
         }
         // Validations rules for normal moves
         else {
@@ -282,7 +268,16 @@ public class Board {
         for (BoardElement p : this.board) { board.add(p.clone()); }
         // NOTE: do not clone this since we can use players as duplicates
         List<Player> players = new ArrayList<>(this.players);
-        return new Board(board, players, winTrayWhite, winTrayBlack, barWhite, barBlack, homeBoardBlack, homeBoardWhite);
+        Board newBoard = new Board(board, players);
+        newBoard.winTrayWhite = winTrayWhite;
+        newBoard.winTrayBlack = winTrayBlack;
+        newBoard.barWhite = barWhite;
+        newBoard.barBlack = barBlack;
+        newBoard.homeBoardWhite = homeBoardWhite;
+        newBoard.homeBoardBlack = homeBoardBlack;
+        newBoard.maxHomeBoardWhite = maxHomeBoardWhite;
+        newBoard.maxHomeBoardBlack = maxHomeBoardBlack;
+        return newBoard;
     }
 
     public boolean isGameOver() {
@@ -334,7 +329,7 @@ public class Board {
                 if (!newDiceMoves.isEmpty()) {
                     Board newBoard = this.clone();
                     newBoard.performMove(move);
-                    List<Move[]> actions = actions(newDiceMoves, player);
+                    List<Move[]> actions = newBoard.actions(newDiceMoves, player);
                     if (actions.isEmpty()) { // We are either done with the game or there are no actions, so return just this move
                         moves.add(new Move[] { move });
                     } else { // Add all possible actions to move list
