@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.dtu.backgammon.App;
+import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 
@@ -17,7 +18,7 @@ public class Human extends Player {
     }
 
     @Override
-    public Move getMove(List<Integer> roll) {
+    public Move getMove(Board board, List<Integer> roll) {
         Scanner scanner = App.scanner;
         String moveInput;
 

@@ -121,7 +121,7 @@ public class Board {
                 List<Integer> rollList = Arrays.stream(roll).boxed().collect(Collectors.toList());
                 List<Move> moveList = new ArrayList<>();
                 while (rollList.size() > 0) {
-                    Move move = p.getMove( rollList );
+                    Move move = p.getMove(this, rollList);
                     if (!rollList.contains(Integer.valueOf(move.getRoll()))) {
                         continue;
                     }
