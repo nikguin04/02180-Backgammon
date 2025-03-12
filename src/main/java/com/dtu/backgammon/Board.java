@@ -74,12 +74,14 @@ public class Board {
     }
 
     private void setupDebugBoard() {
-        whiteHomeBoard = 15;
-        blackHomeBoard = 15;
-        setColumn(0, Brick.WHITE, 2);
-        setColumn(1, Brick.WHITE, 2);
-        setColumn(4, Brick.BLACK, 1);
-        setColumn(8, Brick.BLACK, 1);
+        maxBlackHomeBoard=1;
+        maxWhiteHomeBoard=2;
+        winTrayWhite=13;
+        whiteHomeBoard=2;
+        winTrayBlack=14;
+        blackHomeBoard=1;
+        setColumn(0, Brick.BLACK, 1);
+        setColumn(23, Brick.WHITE, 2);
     }
 
     private void setupStandardBoard() {
@@ -125,7 +127,7 @@ public class Board {
                 List<Move> moveList = new ArrayList<>();
 
                 while (rollList.size() > 0) {
-                    if (actions(rollList,p.brick).isEmpty()){ continue players;}
+                   if (actions(rollList,p.brick).isEmpty()){ continue players;}
 
                     Move move = p.getMove(this, rollList);
                     if (!rollList.contains(Integer.valueOf(move.getRoll()))) {
@@ -143,6 +145,9 @@ public class Board {
                         gameOver = true; // Set the flag to true to break the outer loop
                         break; // Break the inner loop
                     }
+
+                    System.out.println(gameOver);
+                    System.out.println(winTrayWhite);
                 }
                 if (gameOver) {
                     break; // Break the outer loop if the game is over
@@ -229,7 +234,6 @@ public class Board {
         // validity!
     public void performMove(Move move) {
         if (move.isBearingOff()) {
-            board.get(move.from()).count--;
             if (board.get(move.from()).count == 0) {
                 board.get(move.from()).brick = Brick.NONE;
             }
@@ -240,6 +244,7 @@ public class Board {
                 winTrayBlack++;
                 maxBlackHomeBoard--;
             }
+            board.get(move.from()).count--;
         }
         else if (move.isReentry()) {
             if (move.brick() == Brick.WHITE) {
