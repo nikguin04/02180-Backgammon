@@ -3,11 +3,8 @@ package com.dtu.backgammon;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.dtu.backgammon.ai.AI;
-import com.dtu.backgammon.player.Human;
 import com.dtu.backgammon.player.Player;
 
 public class Board {
@@ -58,10 +55,8 @@ public class Board {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
 
-        setupPlayers();
         //setupStandardBoard();
         setupDebugBoard();
-        startGame();
     }
 
     public Board(List<BoardElement> board, List<Player> players) {
@@ -125,7 +120,7 @@ public class Board {
         board.get(column).count = count;
     }
 
-    private void startGame() {
+    public void startGame() {
         outer:
         while (true) { // Outer loop will run until the game is over
             players:
@@ -155,28 +150,6 @@ public class Board {
                 }
             }
         }
-    }
-
-    private void setupPlayers() {
-        // Initialize players
-        Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
-        for (Brick brick : Brick.class.getEnumConstants()) {
-            if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
-
-            System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
-            while (!App.scanner.hasNext(playerPattern)) {
-                App.scanner.next(); // remove current input in scanner buffer
-                System.out.println("Please choose either (Human / AI)");
-            }
-            String playerType = App.scanner.next(playerPattern);
-
-            switch (playerType.toLowerCase()) {
-                case "human" -> players.add(new Human(brick));
-                case "ai" -> players.add(new AI(brick));
-                default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
-            }
-        }
-        App.scanner.nextLine(); // Flush scanner
     }
 
     public Brick getBrickAt(int column, int depth) {
