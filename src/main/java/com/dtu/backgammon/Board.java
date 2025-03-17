@@ -51,6 +51,8 @@ public class Board {
 
     public static int WHITE_START = -1;
     public static int BLACK_START = 24;
+    public static int WHITE_DIR = 1;
+    public static int BLACK_DIR = -1;
 
     public Board() {
         board = new ArrayList<>(24);
@@ -223,6 +225,12 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public void performMoves(Move[] moves) {
+        for (Move move: moves) {
+            performMove(move);
+        }
     }
 
     // Note, does not check validity!
