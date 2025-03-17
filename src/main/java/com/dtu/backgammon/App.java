@@ -1,45 +1,61 @@
 package com.dtu.backgammon;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.ai.AI;
+import com.dtu.backgammon.player.Human;
 
 /**
  * Hello world!
  */
 public class App {
     public static Scanner scanner;
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) {
         scanner = new Scanner(System.in);
         Board board = new Board();
-        //Renderer.render(board);
+        setupPlayers(board);
+        board.startGame();
 
-        /*board.whiteHomeBoard = 15;
+        /*board.homeBoardWhite = 15;
         board.setColumn(21, Brick.WHITE, 1);
         board.setColumn(22, Brick.WHITE, 1);*/
 
         /*board.barWhite = 1;
         board.setColumn(21, Brick.WHITE, 1);
         board.setColumn(9, Brick.WHITE, 3);
-        
+
         AI ai = (AI) board.players.get(0);
 
-        List<Move[]> actions = ai.actions(board, new LinkedList<>(Arrays.asList( new Integer[] {2,2,2,2} )) );
-        for (int i = 0; i < actions.size(); i++) {
-            System.out.print("[");
-            for (int j = 0; j < actions.get(i).length; j++) {
-                System.out.print(actions.get(i)[j].toString() + ", ");
-            }
-            System.out.println("]");
+        List<Move[]> actions = board.actions(List.of(2, 2, 2, 2), ai.brick);
+        for (Move[] action : actions) {
+            System.out.println(Arrays.toString(action));
         }*/
+    }
+
+    static void setupPlayers(Board board) {
+        // Initialize players
+        Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
+        for (Brick brick : Brick.values()) {
+            if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
+
+            System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
+            while (!scanner.hasNext(playerPattern)) {
+                scanner.next(); // Remove current input in scanner buffer
+                System.out.println("Please choose either (Human / AI)");
+            }
+            String playerType = scanner.next(playerPattern);
+
+            switch (playerType.toLowerCase()) {
+                case "human" -> board.players.add(new Human(brick));
+                case "ai" -> board.players.add(new AI(brick));
+                default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
+            }
+        }
+        scanner.nextLine(); // Flush scanner
     }
 }
