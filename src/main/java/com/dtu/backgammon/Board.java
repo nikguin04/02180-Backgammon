@@ -12,7 +12,11 @@ import com.dtu.backgammon.player.Player;
 
 public class Board {
     public enum Brick {
-        NONE, WHITE, BLACK
+        NONE, WHITE, BLACK;
+
+        public Brick opponent() {
+            return this == WHITE ? BLACK : WHITE;
+        }
     }
 
     public static class BoardElement {
@@ -20,6 +24,14 @@ public class Board {
         public int count;
         public BoardElement(Brick brick, int count) { this.brick = brick;this.count = count; }
         @Override public BoardElement clone() { return new BoardElement(brick, count); }
+
+        public Brick getBrick() {
+            return brick;
+        }
+
+        public int getCount() {
+            return count;
+        }
     }
 
     int winTrayWhite = 0;
@@ -55,6 +67,22 @@ public class Board {
     public Board(List<BoardElement> board, List<Player> players) {
         this.board = board;
         this.players = players;
+    }
+
+    public int getBarCount(Brick brick) {
+        return (brick == Brick.WHITE) ? barWhite : barBlack;
+    }
+
+    public int getHomeBoardCount(Brick brick) {
+        return (brick == Brick.WHITE) ? homeBoardWhite : homeBoardBlack;
+    }
+
+    public int getWinTrayCount(Brick brick) {
+        return (brick == Brick.WHITE) ? winTrayWhite : winTrayBlack;
+    }
+
+    public BoardElement[] getPoints() {
+        return board.toArray(new BoardElement[0]);
     }
 
     private void setupDebugBoard() {
