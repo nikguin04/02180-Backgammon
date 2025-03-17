@@ -1,5 +1,7 @@
 package com.dtu.backgammon.ai;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.dtu.backgammon.Board;
@@ -15,6 +17,7 @@ public class AI extends Player {
     }
 
     @Override
+    // Figure out the best first move, and then find the highest eval move
     public Move getMove(Board board, List<Integer> roll) {
         Board boardClone = board.clone();
         Move bestMove = null;
@@ -22,13 +25,15 @@ public class AI extends Player {
 
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
 
+        //For each move in possible moves, clone the board and perform the move
         for (Move[] moveSequence : possibleMoves) {
+
             Board simulatedBoard = boardClone.clone();
             for (Move move : moveSequence) {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectimax(simulatedBoard,roll, MAX_DEPTH, false,brick);
+            int moveValue = expectimax(simulatedBoard, MAX_DEPTH, false, brick);
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -44,36 +49,51 @@ public class AI extends Player {
     }
 
 
-    private static int expectimax(Board board,List<Integer> roll, int depth, boolean maximizingPlayer,Brick brick) {
+    private static int expectimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
         if (depth == 0 || board.isGameOver()) {
-            return evaluateBoard(board,brick);
+            return evaluateBoard(board, brick);
         }
 
-        List<Move[]> possibleMoves = board.actions(roll, brick);
+        List<int[]> possibleRolls = generatePossibleRolls();
+        int totalEval = 0;
 
-        if (maximizingPlayer) {
-            int maxEval = Integer.MIN_VALUE;
-            for (Move[] moveSequence : possibleMoves) {
-                Board simulatedBoard = board.clone();
-                for (Move move : moveSequence) {
-                    simulatedBoard.performMove(move);
+        for (int[] roll : possibleRolls) {
+            List<Move[]> possibleMoves = board.actions(Arrays.stream(roll).boxed().toList(), brick);
+
+            if (maximizingPlayer) {
+                int maxEval = Integer.MIN_VALUE;
+                for (Move[] moveSequence : possibleMoves) {
+                    Board simulatedBoard = board.clone();
+                    for (Move move : moveSequence) {
+                        simulatedBoard.performMove(move);
+                    }
+                    int eval = expectimax(simulatedBoard, depth - 1, false, brick);
+                    maxEval = Math.max(maxEval, eval);
                 }
-                int eval = expectimax(simulatedBoard,roll, depth - 1, false,brick);
-                maxEval = Math.max(maxEval, eval);
-            }
-            return maxEval;
-        } else {
-            int totalEval = 0;
-            for (Move[] moveSequence : possibleMoves) {
-                Board simulatedBoard = board.clone();
-                for (Move move : moveSequence) {
-                    simulatedBoard.performMove(move);
+                totalEval += maxEval;
+            } else {
+                for (Move[] moveSequence : possibleMoves) {
+                    Board simulatedBoard = board.clone();
+                    for (Move move : moveSequence) {
+                        simulatedBoard.performMove(move);
+                    }
+                    int eval = expectimax(simulatedBoard, depth - 1, true, brick);
+                    totalEval += eval;
                 }
-                int eval = expectimax(simulatedBoard,roll, depth - 1, true,brick);
-                totalEval += eval;
             }
-            return totalEval / possibleMoves.size();
         }
+
+        return totalEval / possibleRolls.size();
+    }
+
+    private static List<int[]> generatePossibleRolls() {
+        List<int[]> possibleRolls = new ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 1; j <= 6; j++) {
+                possibleRolls.add(new int[]{i, j});
+            }
+        }
+        return possibleRolls;
     }
 
     private static int evaluateBoard(Board board, Brick brick) {
