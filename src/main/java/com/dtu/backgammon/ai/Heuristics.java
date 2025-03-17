@@ -40,4 +40,32 @@ public class Heuristics {
 
         return 0;
     }
+
+    public static int CalculateTotalBlotPiplossForRoll(Board board, Player player, int[] rolls) {
+
+        Brick oppositeBrick = player.brick == Brick.BLACK ? Brick.WHITE : Brick.BLACK;
+        int piploss = 0;
+        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), player.brick); // Note: might not work due to not beign an ArrayList
+
+        for (Move[] action : actions) {
+            Board newBoard = board.clone();
+            int startScore = newBoard.getScore(oppositeBrick);
+            newBoard.performMoves(action);
+            int diffBar = startScore - newBoard.getScore(oppositeBrick);
+            piploss += diffBar;
+        }
+
+        return piploss;
+    }
+
+    public static int CalculatePipLoss(Board board, Player player) {
+        List<int[]> possibeRolls = AI.generatePossibleRollsNonDupe();
+
+        int totalPiploss = 0;
+        for (int[] roll : possibeRolls) {
+            totalPiploss += CalculateTotalBlotPiplossForRoll(board, player, roll);
+        }
+
+        return totalPiploss;
+    }
 }
