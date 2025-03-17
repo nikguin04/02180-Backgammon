@@ -33,7 +33,7 @@ public class AI extends Player {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectimax(simulatedBoard, MAX_DEPTH, false, brick);
+            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, false, brick);
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -49,8 +49,8 @@ public class AI extends Player {
     }
 
 
-    private static int expectimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
-        if (depth == 0 || board.isGameOver()) {
+    private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+        if (depth >= MAX_DEPTH || board.isGameOver()) {
             return evaluateBoard(board, brick);
         }
 
@@ -67,19 +67,21 @@ public class AI extends Player {
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectimax(simulatedBoard, depth - 1, false, brick);
+                    int eval = expectiminimax(simulatedBoard, depth + 1, false, brick);
                     maxEval = Math.max(maxEval, eval);
                 }
                 totalEval += maxEval;
             } else {
+                int minEval = Integer.MAX_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
                     Board simulatedBoard = board.clone();
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectimax(simulatedBoard, depth - 1, true, brick);
-                    totalEval += eval;
+                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick.opponent());
+                    minEval = Math.min(minEval, eval);
                 }
+                totalEval += minEval;
             }
         }
 
