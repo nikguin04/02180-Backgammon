@@ -54,4 +54,56 @@ public class HeuristicsTest {
         int hits = Heuristics.CalculateBlotHitsForRolls(board, whitep, rolls);
         Assertions.assertEquals(3, hits);
     }
+
+
+    @Test
+    public void CalculatePiplossBlackSingleMove() {
+
+        List<Player> players = new ArrayList<>();
+        Player whitep = new AI(Brick.WHITE);
+        players.add(whitep);
+        Player blackp = new AI(Brick.BLACK);
+        players.add(blackp);
+
+        List<BoardElement> boardelems = new ArrayList<>(24);
+        for (int i = 0; i < 24; i++) {
+            boardelems.add(i, new BoardElement(Brick.NONE, 0));
+        }
+        Board board = new Board(boardelems, players);
+        board.setColumn(10, Brick.WHITE, 1);
+
+        board.setColumn(12, Brick.BLACK, 1);
+        board.setColumn(13, Brick.BLACK, 1);
+
+        int[] roll = {2,3};
+        int piploss = Heuristics.CalculateTotalBlotPiplossForRoll(board, blackp, roll);
+        Assertions.assertEquals(27, piploss);
+    }
+
+
+    @Test
+    public void CalculatePiplossBlackAll() {
+
+        List<Player> players = new ArrayList<>();
+        Player whitep = new AI(Brick.WHITE);
+        players.add(whitep);
+        Player blackp = new AI(Brick.BLACK);
+        players.add(blackp);
+
+        List<BoardElement> boardelems = new ArrayList<>(24);
+        for (int i = 0; i < 24; i++) {
+            boardelems.add(i, new BoardElement(Brick.NONE, 0));
+        }
+        Board board = new Board(boardelems, players);
+        board.setColumn(10, Brick.WHITE, 1);
+        //board.setColumn(14, Brick.WHITE, 1);
+
+        //board.setColumn(12, Brick.BLACK, 1);
+        //board.setColumn(13, Brick.BLACK, 1);
+        board.setColumn(17, Brick.BLACK, 1);
+
+
+        int piploss = Heuristics.CalculatePipLoss(board, blackp);
+        Assertions.assertEquals(84, piploss);
+    }
 }

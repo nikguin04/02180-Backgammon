@@ -96,6 +96,16 @@ public class AI extends Player {
         return possibleRolls;
     }
 
+    public static List<int[]> generatePossibleRollsNonDupe() {
+        List<int[]> possibleRolls = new ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            for (int j = i; j <= 6; j++) {
+                possibleRolls.add(new int[]{i, j});
+            }
+        }
+        return possibleRolls;
+    }
+
     private static int evaluateBoard(Board board, Brick brick) {
         int aiScore = 0;
         int opponentScore = 0;
