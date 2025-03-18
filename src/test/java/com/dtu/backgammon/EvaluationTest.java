@@ -31,13 +31,6 @@ public class EvaluationTest {
         players.add(blackp);
 
         //Dice dice = new Dice(2,3);
-        int[][] rolls = {
-            {2,3},
-            {5,6},
-            {6,6},
-            {1,1,1,1},
-            {3,4}
-        };
 
         List<BoardElement> boardelems = new ArrayList<>(24);
         for (int i = 0; i < 24; i++) {
@@ -51,8 +44,8 @@ public class EvaluationTest {
         board.setColumn(13, Brick.BLACK, 1);
         board.setColumn(17, Brick.BLACK, 1);
 
-        int hits = Evaluation.calculateBlotHitsForRolls(board, whitep, rolls);
-        Assertions.assertEquals(3, hits);
+        int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick);
+        Assertions.assertEquals(13, hits);
     }
 
 
@@ -76,7 +69,7 @@ public class EvaluationTest {
         board.setColumn(13, Brick.BLACK, 1);
 
         int[] roll = {2,3};
-        int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, blackp, roll);
+        int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
         Assertions.assertEquals(27, pipLoss);
     }
 
@@ -103,7 +96,7 @@ public class EvaluationTest {
         board.setColumn(17, Brick.BLACK, 1);
 
 
-        int pipLoss = Evaluation.calculatePipLoss(board, blackp);
+        int pipLoss = Evaluation.calculatePipLoss(board, blackp.brick);
         Assertions.assertEquals(84, pipLoss);
     }
 }
