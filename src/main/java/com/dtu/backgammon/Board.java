@@ -163,6 +163,9 @@ public class Board {
     }
 
     public boolean isValidMove(Move move, Brick player, int roll) {
+        if (!move.isReentry() && board.get(move.from()).brick != player) {
+            return false;
+        }
         // Additional check for bearing off
         if (move.isBearingOff()) {
             return player == Brick.WHITE ? homeBoardWhite >= maxHomeBoardWhite : homeBoardBlack >= maxHomeBoardBlack;
