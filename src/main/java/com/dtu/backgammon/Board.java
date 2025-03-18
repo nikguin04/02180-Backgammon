@@ -210,9 +210,6 @@ public class Board {
     public void performMove(Move move) {
         if (move.isBearingOff()) {
             BoardElement fromPoint = board.get(move.from());
-            if (fromPoint.count == 0) {
-                fromPoint.brick = Brick.NONE;
-            }
             if (fromPoint.brick == Brick.WHITE) {
                 winTrayWhite++;
                 homeBoardWhite--;
@@ -223,14 +220,15 @@ public class Board {
                 maxHomeBoardBlack--;
             }
             fromPoint.count--;
+            if (fromPoint.count == 0) {
+                fromPoint.brick = Brick.NONE;
+            }
         } else {
             BoardElement toPoint = board.get(move.to());
-            if (!move.isReentry()) {
-                if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) { // TODO: Account for already in homeboard
-                    homeBoardBlack++;
-                } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
-                    homeBoardWhite++;
-                }
+            if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) {
+                homeBoardBlack++;
+            } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
+                homeBoardWhite++;
             }
             if (move.brick() == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
                 barBlack++;
