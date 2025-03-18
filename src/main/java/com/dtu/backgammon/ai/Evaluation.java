@@ -1,34 +1,29 @@
 package com.dtu.backgammon.ai;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.dtu.backgammon.Board;
-import com.dtu.backgammon.Dice;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.player.Player;
 
-public class Heuristics {
+public class Evaluation {
 
-    public static int CalculateBlotHitsForRolls(Board board, Player player, int[][] diceRolls) {
+    public static int calculateBlotHitsForRolls(Board board, Player player, int[][] diceRolls) {
         int hits = 0;
 
-        for (int[] roll: diceRolls) {
-            hits += CalculateIfBlotHitForRoll(board, player, roll);
+        for (int[] roll : diceRolls) {
+            hits += calculateIfBlotHitForRoll(board, player, roll);
         }
-
 
         return hits;
     }
-    
-    public static int CalculateIfBlotHitForRoll(Board board, Player player, int[] rolls) {
 
+    public static int calculateIfBlotHitForRoll(Board board, Player player, int[] rolls) {
         Brick oppositeBrick = player.brick == Brick.BLACK ? Brick.WHITE : Brick.BLACK;
-        //int hits = 0;
-        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), player.brick); // Note: might not work due to not beign an ArrayList
+        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), player.brick); // Note: might not work due to not being an ArrayList
 
         for (Move[] action : actions) {
             Board newBoard = board.clone();
@@ -41,11 +36,10 @@ public class Heuristics {
         return 0;
     }
 
-    public static int CalculateTotalBlotPiplossForRoll(Board board, Player player, int[] rolls) {
-
+    public static int calculateTotalBlotPipLossForRoll(Board board, Player player, int[] rolls) {
         Brick oppositeBrick = player.brick == Brick.BLACK ? Brick.WHITE : Brick.BLACK;
         int piploss = 0;
-        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), player.brick); // Note: might not work due to not beign an ArrayList
+        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), player.brick); // Note: might not work due to not being an ArrayList
 
         for (Move[] action : actions) {
             Board newBoard = board.clone();
@@ -58,12 +52,12 @@ public class Heuristics {
         return piploss;
     }
 
-    public static int CalculatePipLoss(Board board, Player player) {
-        List<int[]> possibeRolls = AI.generatePossibleRollsNonDupe();
+    public static int calculatePipLoss(Board board, Player player) {
+        List<int[]> possibleRolls = AI.generatePossibleRollsNonDupe();
 
         int totalPiploss = 0;
-        for (int[] roll : possibeRolls) {
-            totalPiploss += CalculateTotalBlotPiplossForRoll(board, player, roll);
+        for (int[] roll : possibleRolls) {
+            totalPiploss += calculateTotalBlotPipLossForRoll(board, player, roll);
         }
 
         return totalPiploss;

@@ -48,7 +48,6 @@ public class AI extends Player {
         return bestMove;
     }
 
-
     private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
         if (depth >= MAX_DEPTH || board.isGameOver()) {
             return evaluateBoard(board, brick);
@@ -92,7 +91,7 @@ public class AI extends Player {
         List<int[]> possibleRolls = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
             for (int j = 1; j <= 6; j++) {
-                possibleRolls.add(new int[]{i, j});
+                possibleRolls.add(new int[] { i, j });
             }
         }
         return possibleRolls;
@@ -102,7 +101,7 @@ public class AI extends Player {
         List<int[]> possibleRolls = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
             for (int j = i; j <= 6; j++) {
-                possibleRolls.add(new int[]{i, j});
+                possibleRolls.add(new int[] { i, j });
             }
         }
         return possibleRolls;
@@ -156,7 +155,7 @@ public class AI extends Player {
         int end = brick == Brick.WHITE ? 23 : 0;    // White stops at 23, Black stops at 0
         int step = brick == Brick.WHITE ? 1 : -1;   // White moves forward, Black moves backward
 
-    // Find the furthest-back checker of the opponent
+        // Find the furthest-back checker of the opponent
         for (int i = start; brick == Brick.WHITE ? i <= end : i >= end; i += step) {
             Board.BoardElement point = board.getPoints()[i];
             if (point.getBrick() == brick.opponent()) {
@@ -164,7 +163,6 @@ public class AI extends Player {
                 break;
             }
         }
-
 
         // Iterate through the board to detect blockades
         for (int i = 0; i < 24; i++) {
@@ -220,12 +218,8 @@ public class AI extends Player {
         return escapeRolls;
     }
 
-
     @Override
     public String getName() {
         return "AI";
     }
-
-
-
 }

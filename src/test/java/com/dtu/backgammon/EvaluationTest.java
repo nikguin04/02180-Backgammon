@@ -10,19 +10,19 @@ import org.junit.jupiter.api.Test;
 import com.dtu.backgammon.Board.BoardElement;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.ai.AI;
-import com.dtu.backgammon.ai.Heuristics;
+import com.dtu.backgammon.ai.Evaluation;
 import com.dtu.backgammon.player.Player;
 
 /**
- * Unit test for simple App.
+ * Unit test for the Evaluation class.
  */
-public class HeuristicsTest {
+public class EvaluationTest {
 
     /**
      * Rigorous Test :-)
      */
     @Test
-    public void CalculateBlotHitsForRollWhite() {
+    public void calculateBlotHitsForRollWhite() {
 
         List<Player> players = new ArrayList<>();
         Player whitep = new AI(Brick.WHITE);
@@ -51,13 +51,13 @@ public class HeuristicsTest {
         board.setColumn(13, Brick.BLACK, 1);
         board.setColumn(17, Brick.BLACK, 1);
 
-        int hits = Heuristics.CalculateBlotHitsForRolls(board, whitep, rolls);
+        int hits = Evaluation.calculateBlotHitsForRolls(board, whitep, rolls);
         Assertions.assertEquals(3, hits);
     }
 
 
     @Test
-    public void CalculatePiplossBlackSingleMove() {
+    public void calculatePiplossBlackSingleMove() {
 
         List<Player> players = new ArrayList<>();
         Player whitep = new AI(Brick.WHITE);
@@ -76,13 +76,13 @@ public class HeuristicsTest {
         board.setColumn(13, Brick.BLACK, 1);
 
         int[] roll = {2,3};
-        int piploss = Heuristics.CalculateTotalBlotPiplossForRoll(board, blackp, roll);
-        Assertions.assertEquals(27, piploss);
+        int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, blackp, roll);
+        Assertions.assertEquals(27, pipLoss);
     }
 
 
     @Test
-    public void CalculatePiplossBlackAll() {
+    public void calculatePiplossBlackAll() {
 
         List<Player> players = new ArrayList<>();
         Player whitep = new AI(Brick.WHITE);
@@ -103,7 +103,7 @@ public class HeuristicsTest {
         board.setColumn(17, Brick.BLACK, 1);
 
 
-        int piploss = Heuristics.CalculatePipLoss(board, blackp);
-        Assertions.assertEquals(84, piploss);
+        int pipLoss = Evaluation.calculatePipLoss(board, blackp);
+        Assertions.assertEquals(84, pipLoss);
     }
 }
