@@ -125,6 +125,9 @@ public class AI extends Player {
         // Add scores for pieces borne off
         aiScore += board.getWinTrayCount(brick) * 10;
 
+        // Prioritize stacking pieces
+        aiScore += evaluateStacking(board, brick);
+
         return aiScore;
     }
     // Provide
@@ -205,6 +208,15 @@ public class AI extends Player {
         return totalEscapeRolls;
     }
 
+    private static int evaluateStacking(Board board, Brick brick) {
+        int stackingScore = 0;
+        for (Board.BoardElement point : board.getPoints()) {
+            if (point.getBrick() == brick) {
+                stackingScore += point.getCount() * point.getCount(); // Square the count to prioritize stacking
+            }
+        }
+        return stackingScore;
+    }
 
 
     @Override
