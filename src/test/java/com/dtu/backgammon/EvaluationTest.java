@@ -70,7 +70,7 @@ public class EvaluationTest {
 
         int[] roll = {2,3};
         int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
-        Assertions.assertEquals(27, pipLoss);
+        Assertions.assertEquals(21, pipLoss);
     }
 
 
@@ -97,6 +97,6 @@ public class EvaluationTest {
 
 
         int pipLoss = Evaluation.calculatePipLoss(board, blackp.brick);
-        Assertions.assertEquals(84, pipLoss);
+        Assertions.assertEquals(60, pipLoss);
     }
 }

@@ -111,10 +111,10 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-        aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
+        aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/4;
 
         // Calculate pip loss for for all possible moves
-        aiScore += Evaluation.calculatePipLoss(board, brick)/5;
+        aiScore += Evaluation.calculatePipLoss(board, brick)/20;
 
         // Add scores for pieces in the home board
         aiScore += board.getHomeBoardCount(brick) * 2;

@@ -57,8 +57,8 @@ public class Board {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
 
-        //setupStandardBoard();
-        setupDebugBoard();
+        setupStandardBoard();
+        //setupDebugBoard();
     }
 
     public Board(List<BoardElement> board, List<Player> players) {
@@ -269,11 +269,11 @@ public class Board {
         }
     }
 
-    public int getScore(Brick brick) {
+    public int getTotalBrickProgress(Brick brick) {
         int total = 0;
         for (int i = 0; i < board.size(); i++) {
             BoardElement be = board.get(i);
-            int distToHome = brick == Brick.WHITE ? 24-i : i+1;
+            int distToHome = brick == Brick.WHITE ? i : 23-i;
             if (be.brick == brick) { total += be.count * distToHome; }
         }
         return total;
