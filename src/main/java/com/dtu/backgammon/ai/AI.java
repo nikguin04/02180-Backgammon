@@ -33,7 +33,7 @@ public class AI extends Player {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, false, brick);
+            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, true, brick);
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -77,7 +77,7 @@ public class AI extends Player {
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick.opponent());
+                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick);
                     minEval = Math.min(minEval, eval);
                 }
                 totalEval += minEval;
