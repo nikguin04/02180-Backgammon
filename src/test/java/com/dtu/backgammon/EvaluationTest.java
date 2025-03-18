@@ -57,7 +57,7 @@ public class EvaluationTest {
 
 
     @Test
-    public void calculatePiplossBlackSingleMove() {
+    public void calculatePipLossBlackSingleMove() {
 
         List<Player> players = new ArrayList<>();
         Player whitep = new AI(Brick.WHITE);
@@ -82,7 +82,7 @@ public class EvaluationTest {
 
 
     @Test
-    public void calculatePiplossBlackAll() {
+    public void calculatePipLossBlackAll() {
 
         List<Player> players = new ArrayList<>();
         Player whitep = new AI(Brick.WHITE);
