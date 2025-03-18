@@ -1,29 +1,25 @@
 package com.dtu.backgammon.ai;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.Board.Brick;
-import com.dtu.backgammon.player.Player;
 
 public class Evaluation {
 
     public static int calculateBlotHitsForAllRolls(Board board, Brick brick) {
         int hits = 0;
-        List<int[]> possibleRolls = AI.generatePossibleRollsNonDupe();
-        for (int[] roll : possibleRolls) {
-            hits += calculateIfBlotHitForRoll(board, brick, roll);
+        for (AI.Roll roll : AI.ALL_ROLLS) {
+            hits += roll.weight() * calculateIfBlotHitForRoll(board, brick, roll.values());
         }
 
         return hits;
     }
 
-    public static int calculateIfBlotHitForRoll(Board board, Brick brick, int[] rolls) {
+    public static int calculateIfBlotHitForRoll(Board board, Brick brick, List<Integer> rolls) {
         Brick oppositeBrick = brick == Brick.BLACK ? Brick.WHITE : Brick.BLACK;
-        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), brick); // Note: might not work due to not being an ArrayList
+        List<Move[]> actions = board.actions(rolls, brick);
 
         for (Move[] action : actions) {
             Board newBoard = board.clone();
@@ -36,10 +32,10 @@ public class Evaluation {
         return 0;
     }
 
-    public static int calculateTotalBlotPipLossForRoll(Board board, Brick brick, int[] rolls) {
+    public static int calculateTotalBlotPipLossForRoll(Board board, Brick brick, List<Integer> rolls) {
         Brick oppositeBrick = brick.opponent();
         int piploss = 0;
-        List<Move[]> actions = board.actions(Arrays.stream(rolls).boxed().collect(Collectors.toList()), brick); // Note: might not work due to not being an ArrayList
+        List<Move[]> actions = board.actions(rolls, brick);
 
         for (Move[] action : actions) {
             Board newBoard = board.clone();
@@ -53,11 +49,9 @@ public class Evaluation {
     }
 
     public static int calculatePipLoss(Board board, Brick brick) {
-        List<int[]> possibleRolls = AI.generatePossibleRollsNonDupe();
-
         int totalPiploss = 0;
-        for (int[] roll : possibleRolls) {
-            totalPiploss += calculateTotalBlotPipLossForRoll(board, brick, roll);
+        for (AI.Roll roll : AI.ALL_ROLLS) {
+            totalPiploss += roll.weight() * calculateTotalBlotPipLossForRoll(board, brick, roll.values());
         }
 
         return totalPiploss;

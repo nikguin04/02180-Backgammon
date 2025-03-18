@@ -68,7 +68,7 @@ public class EvaluationTest {
         board.setColumn(12, Brick.BLACK, 1);
         board.setColumn(13, Brick.BLACK, 1);
 
-        int[] roll = {2,3};
+        List<Integer> roll = List.of(2, 3);
         int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
         Assertions.assertEquals(21, pipLoss);
     }

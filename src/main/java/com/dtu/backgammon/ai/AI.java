@@ -1,7 +1,6 @@
 package com.dtu.backgammon.ai;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.dtu.backgammon.Board;
@@ -11,6 +10,8 @@ import com.dtu.backgammon.player.Player;
 
 public class AI extends Player {
     private static final int MAX_DEPTH = 2;
+    public static final Roll[] ALL_ROLLS;
+    public static final int NUM_ROLLS = 6 * 6;
 
     public AI(Brick brick) {
         super(brick);
@@ -53,11 +54,10 @@ public class AI extends Player {
             return evaluateBoard(board, brick);
         }
 
-        List<int[]> possibleRolls = generatePossibleRolls();
         int totalEval = 0;
 
-        for (int[] roll : possibleRolls) {
-            List<Move[]> possibleMoves = board.actions(Arrays.stream(roll).boxed().toList(), brick);
+        for (Roll roll : ALL_ROLLS) {
+            List<Move[]> possibleMoves = board.actions(roll.values, brick);
 
             if (maximizingPlayer) {
                 int maxEval = Integer.MIN_VALUE;
@@ -69,7 +69,7 @@ public class AI extends Player {
                     int eval = expectiminimax(simulatedBoard, depth + 1, false, brick);
                     maxEval = Math.max(maxEval, eval);
                 }
-                totalEval += maxEval;
+                totalEval += maxEval * roll.weight;
             } else {
                 int minEval = Integer.MAX_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
@@ -80,31 +80,11 @@ public class AI extends Player {
                     int eval = expectiminimax(simulatedBoard, depth + 1, true, brick);
                     minEval = Math.min(minEval, eval);
                 }
-                totalEval += minEval;
+                totalEval += minEval * roll.weight;
             }
         }
 
-        return totalEval / possibleRolls.size();
-    }
-
-    private static List<int[]> generatePossibleRolls() {
-        List<int[]> possibleRolls = new ArrayList<>();
-        for (int i = 1; i <= 6; i++) {
-            for (int j = 1; j <= 6; j++) {
-                possibleRolls.add(new int[] { i, j });
-            }
-        }
-        return possibleRolls;
-    }
-
-    public static List<int[]> generatePossibleRollsNonDupe() {
-        List<int[]> possibleRolls = new ArrayList<>();
-        for (int i = 1; i <= 6; i++) {
-            for (int j = i; j <= 6; j++) {
-                possibleRolls.add(new int[] { i, j });
-            }
-        }
-        return possibleRolls;
+        return totalEval / NUM_ROLLS;
     }
 
     private static int evaluateBoard(Board board, Brick brick) {
@@ -223,5 +203,20 @@ public class AI extends Player {
     @Override
     public String getName() {
         return "AI";
+    }
+
+    public record Roll(int weight, List<Integer> values) {}
+
+    static {
+        ALL_ROLLS = new Roll[21];
+        int index = 0;
+        for (int i = 1; i <= 6; i++) {
+            ALL_ROLLS[index++] = new Roll(1, List.of(i, i));
+        }
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 1; j < i; j++) {
+                ALL_ROLLS[index++] = new Roll(2, List.of(i, j));
+            }
+        }
     }
 }
