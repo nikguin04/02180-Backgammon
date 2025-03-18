@@ -215,9 +215,11 @@ public class Board {
             }
             if (fromPoint.brick == Brick.WHITE) {
                 winTrayWhite++;
+                homeBoardWhite--;
                 maxHomeBoardWhite--;
             } else if (fromPoint.brick == Brick.BLACK) {
                 winTrayBlack++;
+                homeBoardBlack--;
                 maxHomeBoardBlack--;
             }
             fromPoint.count--;
