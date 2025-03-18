@@ -57,8 +57,8 @@ public class Board {
             board.add(i, new BoardElement(Brick.NONE, 0));
         }
 
-        //setupStandardBoard();
-        setupDebugBoard();
+        setupStandardBoard();
+        //setupDebugBoard();
     }
 
     public Board(List<BoardElement> board, List<Player> players) {

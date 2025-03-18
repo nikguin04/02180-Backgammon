@@ -1,5 +1,6 @@
 package com.dtu.backgammon.ai;
 
+import java.io.IO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +9,8 @@ import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
+
+import static java.io.IO.print;
 
 public class AI extends Player {
     private static final int MAX_DEPTH = 2;
@@ -33,7 +36,9 @@ public class AI extends Player {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, false, brick);
+            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, true, brick);
+            System.out.println("Move: " + Arrays.toString(moveSequence) + " | Evaluation: " + moveValue);
+
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -45,6 +50,7 @@ public class AI extends Player {
             throw new IllegalStateException("No valid move found!");
         }
 
+        System.out.println("Best move: " + bestMove + " | Best evaluation: " + bestValue);
         return bestMove;
     }
 
@@ -77,7 +83,7 @@ public class AI extends Player {
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick.opponent());
+                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick);
                     minEval = Math.min(minEval, eval);
                 }
                 totalEval += minEval;
@@ -111,19 +117,19 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-        aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
+       // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
 
         // Calculate pip loss for for all possible moves
-        aiScore += Evaluation.calculatePipLoss(board, brick)/5;
+       // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
 
         // Add scores for pieces in the home board
-        aiScore += board.getHomeBoardCount(brick) * 2;
+        //aiScore += board.getHomeBoardCount(brick) * 2;
 
         // Step 5: Blockade Evaluation
-        aiScore += evaluateBlockades(board, brick);
+        //aiScore += evaluateBlockades(board, brick);
 
         // Add scores for pieces borne off
-        aiScore += board.getWinTrayCount(brick) * 10;
+        //aiScore += board.getWinTrayCount(brick) * 10;
 
         // Prioritize stacking pieces
         aiScore += evaluateStacking(board, brick);
@@ -211,12 +217,15 @@ public class AI extends Player {
     private static int evaluateStacking(Board board, Brick brick) {
         int stackingScore = 0;
         for (Board.BoardElement point : board.getPoints()) {
-            if (point.getBrick() == brick) {
-                stackingScore += point.getCount() * point.getCount(); // Square the count to prioritize stacking
+            if (point.getBrick() == brick && point.getCount() >= 2) {
+                stackingScore += 10; // Reward each stack equally
+
             }
         }
         return stackingScore;
     }
+
+
 
 
     @Override

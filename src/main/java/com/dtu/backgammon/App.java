@@ -16,6 +16,8 @@ public class App {
     public static Scanner scanner;
 
     public static void main(String[] args) {
+
+
         scanner = new Scanner(System.in);
         Board board = new Board();
         setupPlayers(board);
@@ -36,6 +38,7 @@ public class App {
             System.out.println(Arrays.toString(action));
         }*/
     }
+
 
     static void setupPlayers(Board board) {
         // Initialize players
