@@ -281,13 +281,12 @@ public class Board implements Cloneable {
     }
 
     public List<Move[]> actions(List<Integer> rolls, Brick player) {
-        List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
+        List<List<Integer>> diceMovesAnyOrder;
         if (rolls.size() < 2 || (int) rolls.get(0) == rolls.get(1)) { // All eyes are equal
-            diceMovesAnyOrder.add(rolls);
+            diceMovesAnyOrder = List.of(rolls);
         } else {
             // Scuffed way of reversing dice moves
-            diceMovesAnyOrder.add(List.of(rolls.get(0), rolls.get(1)));
-            diceMovesAnyOrder.add(List.of(rolls.get(1), rolls.get(0)));
+            diceMovesAnyOrder = List.of(List.of(rolls.get(0), rolls.get(1)), List.of(rolls.get(1), rolls.get(0)));
         }
 
         List<Move[]> moves = new ArrayList<>();
@@ -322,9 +321,11 @@ public class Board implements Cloneable {
                         moves.add(new Move[] { move });
                     } else { // Add all possible actions to move list
                         for (Move[] action : actions) {
-                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(action));
-                            nestMoves.add(0, move);
-                            moves.add(nestMoves.toArray(Move[]::new)); // Add list of new moves at this state to the moves array
+                            // Add list of new moves at this state to the moves array
+                            Move[] nestMoves = new Move[action.length + 1];
+                            nestMoves[0] = move;
+                            System.arraycopy(action, 0, nestMoves, 1, action.length);
+                            moves.add(nestMoves);
                         }
                     }
                 } else {
