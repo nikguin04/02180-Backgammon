@@ -1,5 +1,6 @@
 package com.dtu.backgammon;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -136,19 +137,25 @@ public class Board {
                 while (!rollList.isEmpty()) {
                     if (this.clone().actions(rollList, p.brick).isEmpty()) { continue players; }
 
-                    Move move = p.getMove(this, rollList);
-                    if (!rollList.contains(move.getRoll())) {
-                        continue;
-                    }
-                    boolean valid = this.isValidMove(move, p.brick, move.getRoll());
-                    if (valid) {
-                        moveList.add(move);
-                        rollList.remove(Integer.valueOf(move.getRoll()));
-                        this.performMove(move);
-                        Renderer.render(this); // Always render after a move :)
-                    }
+                    Move[] moves = p.getMove(this, rollList);
+                    for (Move move : moves) {
+                        if (!rollList.contains(move.getRoll())) {
+                            continue;
+                        }
+                        boolean valid = this.isValidMove(move, p.brick, move.getRoll());
+                        if (valid) {
+                            moveList.add(move);
+                            rollList.remove(Integer.valueOf(move.getRoll()));
+                            try {
+                                App.writer.write(move.toString() + "\n");
+                                App.writer.flush();
+                            } catch (IOException e) {}
+                            this.performMove(move);
+                            Renderer.render(this); // Always render after a move :)
+                        }
 
-                    if (isGameOver()) { break outer; }
+                        if (isGameOver()) { break outer; }
+                    }
                 }
             }
         }

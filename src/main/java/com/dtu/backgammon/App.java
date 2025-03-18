@@ -1,5 +1,7 @@
 package com.dtu.backgammon;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -14,14 +16,18 @@ import com.dtu.backgammon.player.Human;
  */
 public class App {
     public static Scanner scanner;
+    public static FileWriter writer;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
+        writer = new FileWriter("log.txt");
 
         scanner = new Scanner(System.in);
         Board board = new Board();
         setupPlayers(board);
         board.startGame();
+
+        writer.close();
 
         /*board.homeBoardWhite = 15;
         board.setColumn(21, Brick.WHITE, 1);

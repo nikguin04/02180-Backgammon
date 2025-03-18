@@ -12,6 +12,6 @@ public abstract class Player {
         this.brick = brick;
     }
 
-    public abstract Move getMove(Board board, List<Integer> roll);
+    public abstract Move[] getMove(Board board, List<Integer> roll);
     public abstract String getName();
 }

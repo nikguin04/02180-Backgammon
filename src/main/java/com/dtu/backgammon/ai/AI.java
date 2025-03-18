@@ -18,9 +18,9 @@ public class AI extends Player {
 
     @Override
     // Figure out the best first move, and then find the highest eval move
-    public Move getMove(Board board, List<Integer> roll) {
+    public Move[] getMove(Board board, List<Integer> roll) {
         Board boardClone = board.clone();
-        Move bestMove = null;
+        Move[] bestMove = null;
         int bestValue = Integer.MIN_VALUE;
 
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
@@ -33,11 +33,11 @@ public class AI extends Player {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, true, brick);
+            int moveValue = expectiminimax(simulatedBoard, 0, true, brick);
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
-                bestMove = moveSequence[0];
+                bestMove = moveSequence;
             }
         }
 
