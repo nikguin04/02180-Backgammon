@@ -109,40 +109,23 @@ public class AI extends Player {
 
     private static int evaluateBoard(Board board, Brick brick) {
         int aiScore = 0;
-        int opponentScore = 0;
 
-        for (int i = 0; i < board.getPoints().length; i++) {
-            Board.BoardElement point = board.getPoints()[i];
-            if (point.getBrick() == brick) {
-                aiScore += point.getCount();
-                if (point.getCount() > 1) {
-                    aiScore += 5; // Blockade bonus
-                }
-            } else if (point.getBrick() != null) {
-                opponentScore += point.getCount();
-                if (point.getCount() > 1) {
-                    opponentScore += 5; // Blockade bonus
-                }
-            }
-        }
+        // Calculate blot hits for all possible roll
+        aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
 
-        // Add scores for pieces on the bar
-        aiScore -= board.getBarCount(brick) * 2;
-        opponentScore -= board.getBarCount(brick.opponent()) * 2;
+        // Calculate pip loss for for all possible moves
+        aiScore += Evaluation.calculatePipLoss(board, brick)/5;
 
         // Add scores for pieces in the home board
         aiScore += board.getHomeBoardCount(brick) * 2;
-        opponentScore += board.getHomeBoardCount(brick.opponent()) * 2;
 
         // Step 5: Blockade Evaluation
         aiScore += evaluateBlockades(board, brick);
-        opponentScore += evaluateBlockades(board, brick.opponent());
 
         // Add scores for pieces borne off
         aiScore += board.getWinTrayCount(brick) * 10;
-        opponentScore += board.getWinTrayCount(brick.opponent()) * 10;
 
-        return aiScore - opponentScore;
+        return aiScore;
     }
     // Provide
     private static int evaluateBlockades(Board board, Brick brick) {
