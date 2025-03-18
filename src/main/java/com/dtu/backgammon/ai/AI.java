@@ -124,8 +124,8 @@ public class AI extends Player {
 
         // Find all opponent checkers behind the blockade
         for (int i = start; brick == Brick.WHITE ? i <= end : i >= end; i += step) {
-            Board.BoardElement point = board.getPoints()[i];
-            if (point.getBrick() == brick.opponent()) {
+            Board.Point point = board.board[i];
+            if (point.brick() == brick.opponent()) {
                 trappedPositions.add(i);
                 opponentFarthestBack = i;  // Track the farthest-back opponent
             }
@@ -133,9 +133,9 @@ public class AI extends Player {
 
         // Identify the longest blockade by iterating through the board and finding adjacent columns with more than one stone
         for (int i = 0; i < 24; i++) {
-            Board.BoardElement point = board.getPoints()[i];
+            Board.Point point = board.board[i];
 
-            if (point.getBrick() == brick && point.getCount() > 1) {
+            if (point.brick() == brick && point.count() > 1) {
                 currentBlockadeLength++;
             } else {
                 longestBlockade = Math.max(longestBlockade, currentBlockadeLength);
@@ -175,8 +175,8 @@ public class AI extends Player {
                     int escapePoint = position + rollSum;
 
                     if (escapePoint < 24) {
-                        Board.BoardElement point = board.getPoints()[escapePoint];
-                        if (point.getBrick() != opponentBrick || point.getCount() < 2) {
+                        Board.Point point = board.board[escapePoint];
+                        if (point.brick() != opponentBrick || point.count() < 2) {
                             totalEscapeRolls++;
                             break;  // Only count the best escape roll for a given move
                         }
@@ -190,8 +190,8 @@ public class AI extends Player {
 
     private static int evaluateStacking(Board board, Brick brick) {
         int stackingScore = 0;
-        for (Board.BoardElement point : board.getPoints()) {
-            if (point.getBrick() == brick && point.getCount() >= 2) {
+        for (Board.Point point : board.board) {
+            if (point.brick() == brick && point.count() >= 2) {
                 stackingScore += 10; // Reward each stack equally
 
             }
