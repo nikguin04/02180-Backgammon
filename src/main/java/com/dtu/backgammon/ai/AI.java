@@ -1,6 +1,5 @@
 package com.dtu.backgammon.ai;
 
-import java.io.IO;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,8 +8,6 @@ import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
-
-import static java.io.IO.print;
 
 public class AI extends Player {
     private static final int MAX_DEPTH = 2;
@@ -37,8 +34,6 @@ public class AI extends Player {
             }
 
             int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, true, brick);
-            System.out.println("Move: " + Arrays.toString(moveSequence) + " | Evaluation: " + moveValue);
-
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -50,7 +45,6 @@ public class AI extends Player {
             throw new IllegalStateException("No valid move found!");
         }
 
-        System.out.println("Best move: " + bestMove + " | Best evaluation: " + bestValue);
         return bestMove;
     }
 
@@ -224,8 +218,6 @@ public class AI extends Player {
         }
         return stackingScore;
     }
-
-
 
 
     @Override

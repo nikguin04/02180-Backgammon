@@ -215,32 +215,24 @@ public class Board {
             }
             if (fromPoint.brick == Brick.WHITE) {
                 winTrayWhite++;
+                homeBoardWhite--;
                 maxHomeBoardWhite--;
             } else if (fromPoint.brick == Brick.BLACK) {
                 winTrayBlack++;
+                homeBoardBlack--;
                 maxHomeBoardBlack--;
             }
             fromPoint.count--;
-        } else if (move.isReentry()) {
-            BoardElement toPoint = board.get(move.to());
-            if (move.brick() == Brick.WHITE) {
-                barWhite--;
-                toPoint.count++;
-                toPoint.brick = Brick.WHITE;
-            } else if (move.brick() == Brick.BLACK) {
-                barBlack--;
-                toPoint.count++;
-                toPoint.brick = Brick.BLACK;
-            }
         } else {
-            BoardElement fromPoint = board.get(move.from());
             BoardElement toPoint = board.get(move.to());
-            if (fromPoint.brick == Brick.BLACK && move.to() <= 5 && move.from() > 5) { // TODO: Account for already in homeboard
-                homeBoardBlack++;
-            } else if (fromPoint.brick == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
-                homeBoardWhite++;
+            if (!move.isReentry()) {
+                if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) { // TODO: Account for already in homeboard
+                    homeBoardBlack++;
+                } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
+                    homeBoardWhite++;
+                }
             }
-            if (fromPoint.brick == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
+            if (move.brick() == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
                 barBlack++;
                 toPoint.count--;
                 toPoint.brick = Brick.NONE;
@@ -249,7 +241,7 @@ public class Board {
                 if (move.to() <= 5) {
                     homeBoardBlack--;
                 }
-            } else if (fromPoint.brick == Brick.BLACK && toPoint.brick == Brick.WHITE && toPoint.count == 1) {
+            } else if (move.brick() == Brick.BLACK && toPoint.brick == Brick.WHITE && toPoint.count == 1) {
                 barWhite++;
                 toPoint.count--;
                 toPoint.brick = Brick.NONE;
@@ -259,21 +251,30 @@ public class Board {
                     homeBoardWhite--;
                 }
             }
-            fromPoint.count--;
             toPoint.count++;
-            toPoint.brick = fromPoint.brick; // Set new brick to old brick
-            if (fromPoint.count == 0) {
-                // Set brick to none if board is empty
-                fromPoint.brick = Brick.NONE;
+            toPoint.brick = move.brick(); // Set new brick to old brick
+            if (move.isReentry()) {
+                if (move.brick() == Brick.WHITE) {
+                    barWhite--;
+                } else if (move.brick() == Brick.BLACK) {
+                    barBlack--;
+                }
+            } else {
+                BoardElement fromPoint = board.get(move.from());
+                fromPoint.count--;
+                if (fromPoint.count == 0) {
+                    // Set brick to none if point is empty
+                    fromPoint.brick = Brick.NONE;
+                }
             }
         }
     }
 
-    public int getScore(Brick brick) {
+    public int getTotalBrickProgress(Brick brick) {
         int total = 0;
         for (int i = 0; i < board.size(); i++) {
             BoardElement be = board.get(i);
-            int distToHome = brick == Brick.WHITE ? 24-i : i+1;
+            int distToHome = brick == Brick.WHITE ? i : 23-i;
             if (be.brick == brick) { total += be.count * distToHome; }
         }
         return total;

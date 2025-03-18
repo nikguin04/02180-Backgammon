@@ -43,9 +43,9 @@ public class Evaluation {
 
         for (Move[] action : actions) {
             Board newBoard = board.clone();
-            int startScore = newBoard.getScore(oppositeBrick);
+            int startScore = newBoard.getTotalBrickProgress(oppositeBrick);
             newBoard.performMoves(action);
-            int diffBar = startScore - newBoard.getScore(oppositeBrick);
+            int diffBar = startScore - newBoard.getTotalBrickProgress(oppositeBrick);
             piploss += diffBar;
         }
 
