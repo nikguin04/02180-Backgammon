@@ -144,52 +144,51 @@ public class AI extends Player {
 
         return aiScore - opponentScore;
     }
-
+    // Provide
     private static int evaluateBlockades(Board board, Brick brick) {
         int blockadeScore = 0;
         int longestBlockade = 0;
         int currentBlockadeLength = 0;
-        int escapeRolls = 36; // Maximum possible dice combinations
         int opponentFarthestBack = -1;
-        int start = brick == Brick.WHITE ? 0 : 23;  // White starts at 0, Black starts at 23
-        int end = brick == Brick.WHITE ? 23 : 0;    // White stops at 23, Black stops at 0
-        int step = brick == Brick.WHITE ? 1 : -1;   // White moves forward, Black moves backward
+        List<Integer> trappedPositions = new ArrayList<>();
 
-        // Find the furthest-back checker of the opponent
+        int start = brick == Brick.WHITE ? 0 : 23;
+        int end = brick == Brick.WHITE ? 23 : 0;
+        int step = brick == Brick.WHITE ? 1 : -1;
+
+        // Find all opponent checkers behind the blockade
         for (int i = start; brick == Brick.WHITE ? i <= end : i >= end; i += step) {
             Board.BoardElement point = board.getPoints()[i];
             if (point.getBrick() == brick.opponent()) {
-                opponentFarthestBack = i;
-                break;
+                trappedPositions.add(i);
+                opponentFarthestBack = i;  // Track the farthest-back opponent
             }
         }
 
-        // Iterate through the board to detect blockades
+        // Identify the longest blockade by iterating through the board and finding adjacent columns with more than one stone
         for (int i = 0; i < 24; i++) {
             Board.BoardElement point = board.getPoints()[i];
 
             if (point.getBrick() == brick && point.getCount() > 1) {
                 currentBlockadeLength++;
             } else {
-                if (currentBlockadeLength > 1) {
-                    longestBlockade = Math.max(longestBlockade, currentBlockadeLength);
-                }
+                longestBlockade = Math.max(longestBlockade, currentBlockadeLength);
                 currentBlockadeLength = 0;
             }
         }
 
-        // Assign blockade strength based on length
+        // If a blockade exists, compute its strength
         if (longestBlockade >= 2) {
             int blockadeStrength = longestBlockade * longestBlockade; // Square to emphasize longer blockades
 
-            // Check if opponent is trapped behind blockade
-            if (opponentFarthestBack != -1 && opponentFarthestBack < longestBlockade) {
-                blockadeStrength *= 2; // Double bonus if opponent is actually trapped
+            // Check if opponent is actually trapped
+            if (!trappedPositions.isEmpty() && trappedPositions.get(0) < longestBlockade) {
+                blockadeStrength *= 2;  // Double the bonus if the blockade is effective
             }
 
-            // Reduce score based on escape difficulty
-            escapeRolls = calculateEscapeRolls(board, brick.opponent(), longestBlockade);
-            int containmentValue = 36 - escapeRolls;
+            // Compute escape difficulty for all trapped checkers
+            int escapeRolls = calculateEscapeRolls(board, brick.opponent(), trappedPositions, longestBlockade);
+            int containmentValue = 36 - escapeRolls; // More containment = higher value
 
             blockadeScore += blockadeStrength + containmentValue;
         }
@@ -197,26 +196,33 @@ public class AI extends Player {
         return blockadeScore;
     }
 
-    private static int calculateEscapeRolls(Board board, Brick opponentBrick, int blockadeEnd) {
-        int escapeRolls = 0;
+    private static int calculateEscapeRolls(Board board, Brick opponentBrick, List<Integer> trappedPositions, int blockadeEnd) {
+        int totalEscapeRolls = 0;
 
         // Simulate all dice rolls (1-6, 1-6)
         for (int die1 = 1; die1 <= 6; die1++) {
             for (int die2 = 1; die2 <= 6; die2++) {
                 int rollSum = die1 + die2;
-                int escapePoint = blockadeEnd + rollSum;
 
-                if (escapePoint < 24) {
-                    Board.BoardElement point = board.getPoints()[escapePoint];
-                    if (point.getBrick() != opponentBrick || point.getCount() < 2) {
-                        escapeRolls++;
+                // Check if any trapped checker can escape
+                for (int position : trappedPositions) {
+                    int escapePoint = position + rollSum;
+
+                    if (escapePoint < 24) {
+                        Board.BoardElement point = board.getPoints()[escapePoint];
+                        if (point.getBrick() != opponentBrick || point.getCount() < 2) {
+                            totalEscapeRolls++;
+                            break;  // Only count the best escape roll for a given move
+                        }
                     }
                 }
             }
         }
 
-        return escapeRolls;
+        return totalEscapeRolls;
     }
+
+
 
     @Override
     public String getName() {
