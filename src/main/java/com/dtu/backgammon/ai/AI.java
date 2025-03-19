@@ -27,7 +27,7 @@ public class AI extends Player {
 
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
 
-        //For each move in possible moves, clone the board and perform the move
+        // For each possible set of moves, clone the board and perform the move sequence
         for (Move[] moveSequence : possibleMoves) {
 
             Board simulatedBoard = boardClone.clone();
@@ -35,7 +35,8 @@ public class AI extends Player {
                 simulatedBoard.performMove(move);
             }
 
-            int moveValue = expectiminimax(simulatedBoard, 0, true, brick);
+            // This function acts as depth 0, so start expectiminimax at depth 1
+            int moveValue = expectiminimax(simulatedBoard, 1, false, brick);
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -50,9 +51,10 @@ public class AI extends Player {
         return bestMove;
     }
 
-    private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+    private int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
         if (depth >= MAX_DEPTH || board.isGameOver()) {
-            return evaluateBoard(board, brick);
+            // Always evaluate the board form the perspective of the AI
+            return evaluateBoard(board, this.brick);
         }
 
         int totalEval = 0;
@@ -61,24 +63,26 @@ public class AI extends Player {
             List<Move[]> possibleMoves = board.actions(roll.values, brick);
 
             if (maximizingPlayer) {
+                // Our turn, trying to maximise our score
                 int maxEval = Integer.MIN_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
                     Board simulatedBoard = board.clone();
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, false, brick);
+                    int eval = expectiminimax(simulatedBoard, depth + 1, false, brick.opponent());
                     maxEval = Math.max(maxEval, eval);
                 }
                 totalEval += maxEval * roll.weight;
             } else {
+                // The opponent's turn, trying to minimise our score
                 int minEval = Integer.MAX_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
                     Board simulatedBoard = board.clone();
                     for (Move move : moveSequence) {
                         simulatedBoard.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick);
+                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick.opponent());
                     minEval = Math.min(minEval, eval);
                 }
                 totalEval += minEval * roll.weight;
