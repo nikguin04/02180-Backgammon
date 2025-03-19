@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.dtu.backgammon.Board.BoardElement;
 import com.dtu.backgammon.Board.Brick;
+import com.dtu.backgammon.Board.Point;
 import com.dtu.backgammon.ai.AI;
 import com.dtu.backgammon.ai.Evaluation;
 import com.dtu.backgammon.player.Player;
@@ -32,11 +32,11 @@ public class EvaluationTest {
 
         //Dice dice = new Dice(2,3);
 
-        List<BoardElement> boardelems = new ArrayList<>(24);
+        Point[] points = new Point[24];
         for (int i = 0; i < 24; i++) {
-            boardelems.add(i, new BoardElement(Brick.NONE, 0));
+            points[i] = new Point(Brick.NONE, 0);
         }
-        Board board = new Board(boardelems, players);
+        Board board = new Board(points, players);
         board.setColumn(10, Brick.WHITE, 1);
         board.setColumn(14, Brick.WHITE, 1);
 
@@ -58,17 +58,17 @@ public class EvaluationTest {
         Player blackp = new AI(Brick.BLACK);
         players.add(blackp);
 
-        List<BoardElement> boardelems = new ArrayList<>(24);
+        Point[] points = new Point[24];
         for (int i = 0; i < 24; i++) {
-            boardelems.add(i, new BoardElement(Brick.NONE, 0));
+            points[i] = new Point(Brick.NONE, 0);
         }
-        Board board = new Board(boardelems, players);
+        Board board = new Board(points, players);
         board.setColumn(10, Brick.WHITE, 1);
 
         board.setColumn(12, Brick.BLACK, 1);
         board.setColumn(13, Brick.BLACK, 1);
 
-        int[] roll = {2,3};
+        List<Integer> roll = List.of(2, 3);
         int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
         Assertions.assertEquals(21, pipLoss);
     }
@@ -83,11 +83,11 @@ public class EvaluationTest {
         Player blackp = new AI(Brick.BLACK);
         players.add(blackp);
 
-        List<BoardElement> boardelems = new ArrayList<>(24);
+        Point[] points = new Point[24];
         for (int i = 0; i < 24; i++) {
-            boardelems.add(i, new BoardElement(Brick.NONE, 0));
+            points[i] = new Point(Brick.NONE, 0);
         }
-        Board board = new Board(boardelems, players);
+        Board board = new Board(points, players);
         board.setColumn(10, Brick.WHITE, 1);
         //board.setColumn(14, Brick.WHITE, 1);
 

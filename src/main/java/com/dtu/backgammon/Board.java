@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import com.dtu.backgammon.player.Player;
 
-public class Board {
+public class Board implements Cloneable {
     public enum Brick {
         NONE, WHITE, BLACK;
 
@@ -17,18 +17,15 @@ public class Board {
         }
     }
 
-    public static class BoardElement {
-        public Brick brick;
-        public int count;
-        public BoardElement(Brick brick, int count) { this.brick = brick;this.count = count; }
-        @Override public BoardElement clone() { return new BoardElement(brick, count); }
-
-        public Brick getBrick() {
-            return brick;
+    public record Point(Brick brick, int count) {
+        public static Point EMPTY = new Point(Brick.NONE, 0);
+        public Point withOneLess() {
+            assert count >= 1;
+            return new Point(count > 1 ? brick : Brick.NONE, count - 1);
         }
-
-        public int getCount() {
-            return count;
+        public Point withOneMore(Brick brick) {
+            assert count > 0;
+            return new Point(brick, count + 1);
         }
     }
 
@@ -44,7 +41,7 @@ public class Board {
     int maxHomeBoardWhite = 15;
     int maxHomeBoardBlack = 15;
 
-    public List<BoardElement> board;
+    public Point[] board;
     public List<Player> players = new ArrayList<>();
 
     public static int WHITE_START = -1;
@@ -53,16 +50,16 @@ public class Board {
     public static int BLACK_DIR = -1;
 
     public Board() {
-        board = new ArrayList<>(24);
+        board = new Point[24];
         for (int i = 0; i < 24; i++) {
-            board.add(i, new BoardElement(Brick.NONE, 0));
+            board[i] = new Point(Brick.NONE, 0);
         }
 
         setupStandardBoard();
         //setupDebugBoard();
     }
 
-    public Board(List<BoardElement> board, List<Player> players) {
+    public Board(Point[] board, List<Player> players) {
         this.board = board;
         this.players = players;
     }
@@ -77,10 +74,6 @@ public class Board {
 
     public int getWinTrayCount(Brick brick) {
         return (brick == Brick.WHITE) ? winTrayWhite : winTrayBlack;
-    }
-
-    public BoardElement[] getPoints() {
-        return board.toArray(new BoardElement[0]);
     }
 
     private void setupDebugBoard() {
@@ -107,20 +100,19 @@ public class Board {
 
         // Count initial checkers in home board
         for (int i = 0; i <= 5; i++) { // Black home board
-            if (board.get(i).brick == Brick.BLACK) {
-                homeBoardBlack += board.get(i).count;
+            if (board[i].brick == Brick.BLACK) {
+                homeBoardBlack += board[i].count;
             }
         }
         for (int i = 18; i <= 23; i++) { // White home board
-            if (board.get(i).brick == Brick.WHITE) {
-                homeBoardWhite += board.get(i).count;
+            if (board[i].brick == Brick.WHITE) {
+                homeBoardWhite += board[i].count;
             }
         }
     }
 
     public void setColumn(int column, Brick player, int count) {
-        board.get(column).brick = player;
-        board.get(column).count = count;
+        board[column] = new Point(player, count);
     }
 
     public void startGame() {
@@ -162,7 +154,7 @@ public class Board {
     }
 
     public Brick getBrickAt(int column, int depth) {
-        return (board.get(column).count > depth) ? board.get(column).brick : Brick.NONE;
+        return (board[column].count > depth) ? board[column].brick : Brick.NONE;
     }
 
     public boolean hasBrickInBar(Brick brick) {
@@ -170,7 +162,7 @@ public class Board {
     }
 
     public boolean isValidMove(Move move, Brick player, int roll) {
-        if (!move.isReentry() && board.get(move.from()).brick != player) {
+        if (!move.isReentry() && board[move.from()].brick != player) {
             return false;
         }
         // Additional check for bearing off
@@ -189,7 +181,7 @@ public class Board {
                     return false;
                 }
             }
-            BoardElement toPoint = board.get(move.to());
+            Point toPoint = board[move.to()];
             // Ensure a maximum of 5 stones in one location
             if (toPoint.count >= 5) {
                 return false;
@@ -219,7 +211,7 @@ public class Board {
     // Note, does not check validity!
     public void performMove(Move move) {
         if (move.isBearingOff()) {
-            BoardElement fromPoint = board.get(move.from());
+            Point fromPoint = board[move.from()];
             if (fromPoint.brick == Brick.WHITE) {
                 winTrayWhite++;
                 homeBoardWhite--;
@@ -229,12 +221,9 @@ public class Board {
                 homeBoardBlack--;
                 maxHomeBoardBlack--;
             }
-            fromPoint.count--;
-            if (fromPoint.count == 0) {
-                fromPoint.brick = Brick.NONE;
-            }
+            board[move.from()] = fromPoint.withOneLess();
         } else {
-            BoardElement toPoint = board.get(move.to());
+            Point toPoint = board[move.to()];
             if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) {
                 homeBoardBlack++;
             } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
@@ -242,8 +231,7 @@ public class Board {
             }
             if (move.brick() == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
                 barBlack++;
-                toPoint.count--;
-                toPoint.brick = Brick.NONE;
+                toPoint = board[move.to()] = Point.EMPTY;
 
                 // If hit piece was in the black home board, decrease count
                 if (move.to() <= 5) {
@@ -251,16 +239,14 @@ public class Board {
                 }
             } else if (move.brick() == Brick.BLACK && toPoint.brick == Brick.WHITE && toPoint.count == 1) {
                 barWhite++;
-                toPoint.count--;
-                toPoint.brick = Brick.NONE;
+                toPoint = board[move.to()] = Point.EMPTY;
 
                 // If hit piece was in the white home board, decrease count
                 if (move.to() >= 18) {
                     homeBoardWhite--;
                 }
             }
-            toPoint.count++;
-            toPoint.brick = move.brick(); // Set new brick to old brick
+            board[move.to()] = toPoint.withOneMore(move.brick());
             if (move.isReentry()) {
                 if (move.brick() == Brick.WHITE) {
                     barWhite--;
@@ -268,44 +254,19 @@ public class Board {
                     barBlack--;
                 }
             } else {
-                BoardElement fromPoint = board.get(move.from());
-                fromPoint.count--;
-                if (fromPoint.count == 0) {
-                    // Set brick to none if point is empty
-                    fromPoint.brick = Brick.NONE;
-                }
+                board[move.from()] = board[move.from()].withOneLess();
             }
         }
     }
 
     public int getTotalBrickProgress(Brick brick) {
         int total = 0;
-        for (int i = 0; i < board.size(); i++) {
-            BoardElement be = board.get(i);
+        for (int i = 0; i < board.length; i++) {
+            Point be = board[i];
             int distToHome = brick == Brick.WHITE ? i : 23-i;
             if (be.brick == brick) { total += be.count * distToHome; }
         }
         return total;
-    }
-
-    @Override
-    public Board clone() {
-        // Returning a clone of the current object
-
-        List<BoardElement> board = new ArrayList<>();
-        for (BoardElement p : this.board) { board.add(p.clone()); }
-        // NOTE: do not clone this since we can use players as duplicates
-        List<Player> players = new ArrayList<>(this.players);
-        Board newBoard = new Board(board, players);
-        newBoard.winTrayWhite = winTrayWhite;
-        newBoard.winTrayBlack = winTrayBlack;
-        newBoard.barWhite = barWhite;
-        newBoard.barBlack = barBlack;
-        newBoard.homeBoardWhite = homeBoardWhite;
-        newBoard.homeBoardBlack = homeBoardBlack;
-        newBoard.maxHomeBoardWhite = maxHomeBoardWhite;
-        newBoard.maxHomeBoardBlack = maxHomeBoardBlack;
-        return newBoard;
     }
 
     public boolean isGameOver() {
@@ -320,27 +281,25 @@ public class Board {
     }
 
     public List<Move[]> actions(List<Integer> rolls, Brick player) {
-        List<BoardElement> boardElements = this.board;
-        List<List<Integer>> diceMovesAnyOrder = new ArrayList<>();
+        List<List<Integer>> diceMovesAnyOrder;
         if (rolls.size() < 2 || (int) rolls.get(0) == rolls.get(1)) { // All eyes are equal
-            diceMovesAnyOrder.add(rolls);
+            diceMovesAnyOrder = List.of(rolls);
         } else {
             // Scuffed way of reversing dice moves
-            diceMovesAnyOrder.add(List.of(rolls.get(0), rolls.get(1)));
-            diceMovesAnyOrder.add(List.of(rolls.get(1), rolls.get(0)));
+            diceMovesAnyOrder = List.of(List.of(rolls.get(0), rolls.get(1)), List.of(rolls.get(1), rolls.get(0)));
         }
 
         List<Move[]> moves = new ArrayList<>();
         for (List<Integer> diceMove : diceMovesAnyOrder) { // TODO: Make sure to break if no bricks but not all moves are used
-            for (int i = 0; i < boardElements.size(); i++) {
+            for (int i = 0; i < board.length; i++) {
                 Move move;
                 if (hasBrickInBar(player)) { // Player has brick in the tray and needs to move them out first
                     int startPos = player == Brick.BLACK ? Board.BLACK_START : Board.WHITE_START;
                     int toPosition = startPos + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1); // Calculate the absolut to position for reentry
                     move = new Move(startPos, toPosition, Move.MoveType.REENTRY, player);
-                    i = boardElements.size(); // Make sure to break loop if we have a brick in tray
+                    i = board.length; // Make sure to break loop if we have a brick in tray
                 } else {
-                    if (boardElements.get(i).brick != player) { continue; }
+                    if (board[i].brick != player) { continue; }
                     // The current player has bricks to move here
 
                     int toPosition = i + diceMove.get(0) * (player == Brick.BLACK ? -1 : 1);
@@ -362,9 +321,11 @@ public class Board {
                         moves.add(new Move[] { move });
                     } else { // Add all possible actions to move list
                         for (Move[] action : actions) {
-                            List<Move> nestMoves = new ArrayList<>(Arrays.asList(action));
-                            nestMoves.add(0, move);
-                            moves.add(nestMoves.toArray(Move[]::new)); // Add list of new moves at this state to the moves array
+                            // Add list of new moves at this state to the moves array
+                            Move[] nestMoves = new Move[action.length + 1];
+                            nestMoves[0] = move;
+                            System.arraycopy(action, 0, nestMoves, 1, action.length);
+                            moves.add(nestMoves);
                         }
                     }
                 } else {
@@ -373,5 +334,16 @@ public class Board {
             }
         }
         return moves;
+    }
+
+    @Override
+    public Board clone() {
+        try {
+            Board newBoard = (Board) super.clone();
+            newBoard.board = board.clone();
+            return newBoard;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e);
+        }
     }
 }
