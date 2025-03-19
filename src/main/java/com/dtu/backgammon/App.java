@@ -17,11 +17,27 @@ public class App {
 
     public static void main(String[] args) {
 
-
-        scanner = new Scanner(System.in);
         Board board = new Board();
-        setupPlayers(board);
-        board.startGame();
+        setupStandardCheckerSetup(board);
+
+        // Initialize AI player
+        AI ai = new AI(Brick.WHITE);
+        board.players.add(ai);
+
+        // Simulate the specific dice roll (6 and 1)
+        List<Integer> roll = List.of(5, 3);
+
+        // Get the AI's moves
+        Move bestMove = ai.getMove(board, roll);
+
+        board.performMove(bestMove);
+        System.out.println("AI performed move: " + bestMove);
+
+
+//        scanner = new Scanner(System.in);
+//        Board board = new Board();
+//        setupPlayers(board);
+//        board.startGame();
 
         /*board.homeBoardWhite = 15;
         board.setColumn(21, Brick.WHITE, 1);
@@ -39,6 +55,18 @@ public class App {
         }*/
     }
 
+    private static void setupStandardCheckerSetup(Board board) {
+        // Set up the standard checker setup
+        board.setColumn(0, Brick.WHITE, 2);
+        board.setColumn(11, Brick.WHITE, 5);
+        board.setColumn(16, Brick.WHITE, 3);
+        board.setColumn(18, Brick.WHITE, 5);
+
+        board.setColumn(23, Brick.BLACK, 2);
+        board.setColumn(12, Brick.BLACK, 5);
+        board.setColumn(7, Brick.BLACK, 3);
+        board.setColumn(5, Brick.BLACK, 5);
+    }
 
     static void setupPlayers(Board board) {
         // Initialize players

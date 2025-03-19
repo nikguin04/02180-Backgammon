@@ -34,7 +34,7 @@ public class AI extends Player {
             }
 
             int moveValue = expectiminimax(simulatedBoard, MAX_DEPTH, true, brick);
-
+            System.out.println("Evaluating move: " + Arrays.toString(moveSequence) + " with eval: " + moveValue);
             if (moveValue > bestValue) {
                 bestValue = moveValue;
                 bestMove = moveSequence[0];
@@ -117,7 +117,7 @@ public class AI extends Player {
        // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
 
         // Add scores for pieces in the home board
-        //aiScore += board.getHomeBoardCount(brick) * 2;
+        //aiScore += evaluateHomeBoard(board, brick;
 
         // Step 5: Blockade Evaluation
         //aiScore += evaluateBlockades(board, brick);
@@ -210,15 +210,39 @@ public class AI extends Player {
 
     private static int evaluateStacking(Board board, Brick brick) {
         int stackingScore = 0;
-        for (Board.BoardElement point : board.getPoints()) {
-            if (point.getBrick() == brick && point.getCount() >= 2) {
-                stackingScore += 10; // Reward each stack equally
+        int[] anchorPoints = brick == Brick.BLACK ? new int[]{18, 19, 20} : new int[]{5, 4, 3};
 
+        for (int i = 0; i < board.getPoints().length; i++) {
+            Board.BoardElement point = board.getPoints()[i];
+            final int index = i; // Make the variable effectively final
+            if (point.getBrick() == brick) {
+                if (point.getCount() >= 2) {
+                    stackingScore += 10; // Reward each stack equally
+                }
+                if (point.getCount() > 2 && Arrays.stream(anchorPoints).anyMatch(ap -> ap == index)) {
+                    stackingScore += (index == anchorPoints[0] ? 30 : 20); // Stronger anchor points get higher scores
+                }
             }
         }
         return stackingScore;
     }
 
+    private static int evaluateHomeBoard(Board board, Brick brick) {
+        int homeBoardScore = 0;
+        int start = brick == Brick.WHITE ? 18 : 0;
+        int end = brick == Brick.WHITE ? 23 : 5;
+        int step = 1;
+
+        for (int i = start; i <= end; i += step) {
+            Board.BoardElement point = board.getPoints()[i];
+            if (point.getBrick() == brick) {
+                int distanceToEdge = brick == Brick.WHITE ? 23 - i : i;
+                homeBoardScore += point.getCount() * (distanceToEdge + 1);
+            }
+        }
+
+        return homeBoardScore;
+    }
 
     @Override
     public String getName() {
