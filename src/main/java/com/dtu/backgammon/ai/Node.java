@@ -6,20 +6,51 @@ import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
 public class Node {
-    private Move[] moveSequence;  // Sequence of moves
+    private Move[] moveSequence;
     private Board board;
     private Brick brick;
-    private int wins;
-    private int losses;
-    private int simulations;
+    private int wins = 0;
+    private int losses = 0;
+    private int visits = 0;
+    private Node parent;
 
-    public Node(Move[] moveSequence, Board board, Brick brick) {
+    public Node(Move[] moveSequence, Board board, Brick brick, Node parent) {
         this.moveSequence = moveSequence;
         this.board = board;
         this.brick = brick;
-        this.wins = 0;
-        this.losses = 0;
-        this.simulations = 0;
+        this.parent = parent;
+    }
+
+    public void incrementWins() {
+        wins++;
+    }
+
+    public void incrementLosses() {
+        losses++;
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
+    public int getLosses() {
+        return losses;
+    }
+
+    public int getVisits() {
+        return visits;
+    }
+
+    public void incrementVisits() {
+        visits++;
+    }
+
+    public Node getParent() {
+        return parent;
+    }
+
+    public int getTotalVisits() {
+        return parent == null ? visits : parent.getTotalVisits();
     }
 
     public Move[] getMoveSequence() {
@@ -33,20 +64,4 @@ public class Node {
     public Brick getBrick() {
         return brick;
     }
-
-    public int getWins() {
-        return wins;
-    }
-
-    public void incrementWins() {
-        wins++;
-        simulations++;
-    }
-
-    public void incrementLosses() {
-        losses++;
-        simulations++;
-    }
 }
-
-

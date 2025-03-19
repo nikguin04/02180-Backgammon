@@ -24,7 +24,7 @@ public class MonteCarlo {
         // Simulate all possible move sequences
         List<Node> nodes = new ArrayList<>();
         for (Move[] moveSequence : possibleMoves) {
-            Node node = new Node(moveSequence, boardClone.clone(), brick);
+            Node node = new Node(moveSequence, boardClone.clone(), brick,null);
             nodes.add(node);
         }
 
@@ -36,7 +36,11 @@ public class MonteCarlo {
         }
 
         // Select the move sequence with the highest win rate
-        Node bestNode = nodes.stream().max(Comparator.comparingInt(Node::getWins)).orElseThrow();
+        //Node bestNode = nodes.stream().max(Comparator.comparingInt(Node::getWins)).orElseThrow();
+        Node bestNode = nodes.stream()
+                .max(Comparator.comparingDouble(node -> ucbValue(node)))
+                .orElseThrow();
+
         return bestNode.getMoveSequence();
     }
 
@@ -83,5 +87,24 @@ public class MonteCarlo {
         int die2 = rand.nextInt(6) + 1;
         return Arrays.asList(die1, die2);
     }
+
+    private static double ucbValue(Node node) {
+        int wins = node.getWins();
+        int visits = node.getVisits();  // The number of times this move has been explored
+
+        // Handling case where parent is null (root node)
+        int totalVisits = node.getParent() == null ? visits : node.getParent().getTotalVisits();
+
+        // The constant C controls the exploration-exploitation tradeoff
+        double C = 1.41;  // Example value, this can be tuned
+
+        // UCB formula
+        double averageReward = (double) wins / visits;
+        double explorationFactor = C * Math.sqrt(Math.log(totalVisits) / visits);
+
+        return averageReward + explorationFactor;
+    }
+
+
 
 }
