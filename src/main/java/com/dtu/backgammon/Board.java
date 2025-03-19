@@ -151,6 +151,7 @@ public class Board implements Cloneable {
                 }
             }
         }
+        System.out.println("Congratulations " + getWinner() + ", you won the Game!!!");
     }
 
     public Brick getBrickAt(int column, int depth) {
@@ -270,14 +271,12 @@ public class Board implements Cloneable {
     }
 
     public boolean isGameOver() {
-        if (winTrayWhite == 15) {
-            System.out.println("Congratulations White, you won the Game!!!");
-            return true;
-        } else if (winTrayBlack == 15) {
-            System.out.println("Congratulations Black, you won the Game!!!");
-            return true;
-        }
-        return false;
+        return winTrayWhite == 15 || winTrayBlack == 15;
+    }
+
+    public Brick getWinner() {
+        if (!isGameOver()) { return null; }
+        return winTrayWhite == 15 ? Brick.WHITE : Brick.BLACK;
     }
 
     public List<Move[]> actions(List<Integer> rolls, Brick player) {
