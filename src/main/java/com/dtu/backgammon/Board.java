@@ -290,6 +290,7 @@ public class Board implements Cloneable {
 
         List<Move[]> moves = new ArrayList<>();
         for (List<Integer> diceMove : diceMovesAnyOrder) { // TODO: Make sure to break if no bricks but not all moves are used
+            List<Integer> newDiceMoves = diceMove.subList(1, diceMove.size());
             for (int i = 0; i < board.length; i++) {
                 Move move;
                 if (hasBrickInBar(player)) { // Player has brick in the tray and needs to move them out first
@@ -308,9 +309,6 @@ public class Board implements Cloneable {
                 }
 
                 if (!isValidMove(move, player, diceMove.get(0))) { continue; } // Move is not valid
-
-                List<Integer> newDiceMoves = new ArrayList<>(diceMove);
-                newDiceMoves.remove(0);
 
                 if (!newDiceMoves.isEmpty()) {
                     Board newBoard = this.clone();
