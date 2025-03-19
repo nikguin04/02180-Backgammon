@@ -1,5 +1,6 @@
 package com.dtu.backgammon;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -136,19 +137,25 @@ public class Board {
                 while (!rollList.isEmpty()) {
                     if (this.clone().actions(rollList, p.brick).isEmpty()) { continue players; }
 
-                    Move move = p.getMove(this, rollList);
-                    if (!rollList.contains(move.getRoll())) {
-                        continue;
-                    }
-                    boolean valid = this.isValidMove(move, p.brick, move.getRoll());
-                    if (valid) {
-                        moveList.add(move);
-                        rollList.remove(Integer.valueOf(move.getRoll()));
-                        this.performMove(move);
-                        Renderer.render(this); // Always render after a move :)
-                    }
+                    Move[] moves = p.getMove(this, rollList);
+                    for (Move move : moves) {
+                        if (!rollList.contains(move.getRoll())) {
+                            continue;
+                        }
+                        boolean valid = this.isValidMove(move, p.brick, move.getRoll());
+                        if (valid) {
+                            moveList.add(move);
+                            rollList.remove(Integer.valueOf(move.getRoll()));
+                            try {
+                                App.writer.write(move.toString() + "\n");
+                                App.writer.flush();
+                            } catch (IOException e) {}
+                            this.performMove(move);
+                            Renderer.render(this); // Always render after a move :)
+                        }
 
-                    if (isGameOver()) { break outer; }
+                        if (isGameOver()) { break outer; }
+                    }
                 }
             }
         }
@@ -163,6 +170,9 @@ public class Board {
     }
 
     public boolean isValidMove(Move move, Brick player, int roll) {
+        if (!move.isReentry() && board.get(move.from()).brick != player) {
+            return false;
+        }
         // Additional check for bearing off
         if (move.isBearingOff()) {
             return player == Brick.WHITE ? homeBoardWhite >= maxHomeBoardWhite : homeBoardBlack >= maxHomeBoardBlack;
@@ -210,9 +220,6 @@ public class Board {
     public void performMove(Move move) {
         if (move.isBearingOff()) {
             BoardElement fromPoint = board.get(move.from());
-            if (fromPoint.count == 0) {
-                fromPoint.brick = Brick.NONE;
-            }
             if (fromPoint.brick == Brick.WHITE) {
                 winTrayWhite++;
                 homeBoardWhite--;
@@ -223,14 +230,15 @@ public class Board {
                 maxHomeBoardBlack--;
             }
             fromPoint.count--;
+            if (fromPoint.count == 0) {
+                fromPoint.brick = Brick.NONE;
+            }
         } else {
             BoardElement toPoint = board.get(move.to());
-            if (!move.isReentry()) {
-                if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) { // TODO: Account for already in homeboard
-                    homeBoardBlack++;
-                } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
-                    homeBoardWhite++;
-                }
+            if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) {
+                homeBoardBlack++;
+            } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
+                homeBoardWhite++;
             }
             if (move.brick() == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
                 barBlack++;

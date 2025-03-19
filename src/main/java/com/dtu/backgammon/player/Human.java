@@ -18,7 +18,7 @@ public class Human extends Player {
     }
 
     @Override
-    public Move getMove(Board board, List<Integer> roll) {
+    public Move[] getMove(Board board, List<Integer> roll) {
         Scanner scanner = App.scanner;
         String moveInput;
 
@@ -39,7 +39,8 @@ public class Human extends Player {
                 if (from >= 0 && from < 24 && to >= 0 && to < 24) { 
                     // Create and store the move
                     Move move = new Move(from, to, Move.MoveType.NORMAL, brick);
-                    return move;
+                    Move[] ret = {move};
+                    return ret;
                 }
             } else if (Pattern.matches("\\d+ W \\d+", moveInput)) {
                 String[] positions = moveInput.split(" ");
