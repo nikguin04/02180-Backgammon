@@ -1,6 +1,7 @@
 package com.dtu.backgammon.ai;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.dtu.backgammon.Board;
@@ -97,7 +98,7 @@ public class AI extends Player {
        // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
 
         // Add scores for pieces in the home board
-        //aiScore += board.getHomeBoardCount(brick) * 2;
+        //aiScore += evaluateHomeBoard(board, brick;
 
         // Step 5: Blockade Evaluation
         //aiScore += evaluateBlockades(board, brick);
@@ -190,15 +191,39 @@ public class AI extends Player {
 
     private static int evaluateStacking(Board board, Brick brick) {
         int stackingScore = 0;
-        for (Board.Point point : board.board) {
-            if (point.brick() == brick && point.count() >= 2) {
-                stackingScore += 10; // Reward each stack equally
+        int[] anchorPoints = brick == Brick.BLACK ? new int[]{18, 19, 20} : new int[]{5, 4, 3};
 
+        for (int i = 0; i < board.board.length; i++) {
+            Board.Point point = board.board[i];
+            final int index = i; // Make the variable effectively final
+            if (point.brick() == brick) {
+                if (point.count() >= 2) {
+                    stackingScore += 10; // Reward each stack equally
+                }
+                if (point.count() > 2 && Arrays.stream(anchorPoints).anyMatch(ap -> ap == index)) {
+                    stackingScore += (index == anchorPoints[0] ? 30 : 20); // Stronger anchor points get higher scores
+                }
             }
         }
         return stackingScore;
     }
 
+    private static int evaluateHomeBoard(Board board, Brick brick) {
+        int homeBoardScore = 0;
+        int start = brick == Brick.WHITE ? 18 : 0;
+        int end = brick == Brick.WHITE ? 23 : 5;
+        int step = 1;
+
+        for (int i = start; i <= end; i += step) {
+            Board.Point point = board.board[i];
+            if (point.brick() == brick) {
+                int distanceToEdge = brick == Brick.WHITE ? 23 - i : i;
+                homeBoardScore += point.count() * (distanceToEdge + 1);
+            }
+        }
+
+        return homeBoardScore;
+    }
 
     @Override
     public String getName() {

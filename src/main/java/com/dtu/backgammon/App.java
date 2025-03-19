@@ -45,6 +45,18 @@ public class App {
         }*/
     }
 
+    private static void setupStandardCheckerSetup(Board board) {
+        // Set up the standard checker setup
+        board.setColumn(0, Brick.WHITE, 2);
+        board.setColumn(11, Brick.WHITE, 5);
+        board.setColumn(16, Brick.WHITE, 3);
+        board.setColumn(18, Brick.WHITE, 5);
+
+        board.setColumn(23, Brick.BLACK, 2);
+        board.setColumn(12, Brick.BLACK, 5);
+        board.setColumn(7, Brick.BLACK, 3);
+        board.setColumn(5, Brick.BLACK, 5);
+    }
 
     static void setupPlayers(Board board) {
         // Initialize players
