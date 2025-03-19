@@ -10,6 +10,7 @@ import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
 public class AI extends Player {
+
     private static final int MAX_DEPTH = 2;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
@@ -18,6 +19,8 @@ public class AI extends Player {
         super(brick);
     }
 
+
+   /*
     @Override
     // Figure out the best first move, and then find the highest eval move
     public Move[] getMove(Board board, List<Integer> roll) {
@@ -49,6 +52,17 @@ public class AI extends Player {
 
         return bestMove;
     }
+
+    */
+
+
+    @Override
+    public Move[] getMove(Board board, List<Integer> roll) {
+        // Use MCTS to get the best sequence of moves
+        return MonteCarlo.getBestMove(board, roll, brick);
+    }
+
+
 
     private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
         if (depth >= MAX_DEPTH || board.isGameOver()) {
