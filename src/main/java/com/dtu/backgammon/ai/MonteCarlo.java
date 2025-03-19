@@ -12,11 +12,14 @@ import com.dtu.backgammon.Move;
 
 public class MonteCarlo {
     private static final int SIMULATION_COUNT = 1000;  // Number of simulations per move
-    private static final int MAX_DEPTH = 20;  // Max depth for simulations
+    private static final int MAX_DEPTH = 4;  // Max depth for simulations
 
     public static Move[] getBestMove(Board board, List<Integer> roll, Brick brick) {
+        System.out.println(roll);
+        System.out.println(brick.name());
         Board boardClone = board.clone();
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
+
 
         // Simulate all possible move sequences
         List<Node> nodes = new ArrayList<>();
@@ -43,10 +46,18 @@ public class MonteCarlo {
         Brick currentPlayer = node.getBrick();
         List<Integer> roll = generateRandomRoll();
 
+
+
+
         // Perform random moves until the game ends or the max depth is reached
         int depth = 0;
         while (!boardCopy.isGameOver() && depth < MAX_DEPTH) {
             List<Move[]> possibleMoves = boardCopy.actions(roll, currentPlayer);
+
+            if (possibleMoves.isEmpty()){return;}
+
+
+
             Move[] randomMove = possibleMoves.get(new Random().nextInt(possibleMoves.size()));
             for (Move move : randomMove) {
                 boardCopy.performMove(move);
