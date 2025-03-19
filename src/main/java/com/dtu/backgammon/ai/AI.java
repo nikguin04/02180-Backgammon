@@ -211,7 +211,7 @@ public class AI extends Player {
         ALL_ROLLS = new Roll[21];
         int index = 0;
         for (int i = 1; i <= 6; i++) {
-            ALL_ROLLS[index++] = new Roll(1, List.of(i, i));
+            ALL_ROLLS[index++] = new Roll(1, List.of(i, i, i, i));
         }
         for (int i = 1; i <= 6; i++) {
             for (int j = 1; j < i; j++) {
