@@ -3,6 +3,8 @@ package com.dtu.backgammon.ai;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
@@ -13,6 +15,8 @@ public class AI extends Player {
     private static final int MAX_DEPTH = 2;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
+    
+    private static final ForkJoinPool pool = new ForkJoinPool(); // Global thread pool
 
     public AI(Brick brick) {
         super(brick);
@@ -28,19 +32,27 @@ public class AI extends Player {
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
 
         // For each possible set of moves, clone the board and perform the move sequence
+        List<ExpectiminimaxTask> tasks = new ArrayList<>();
+        
+        // Parallelize expectiminimax at depth 1
         for (Move[] moveSequence : possibleMoves) {
 
             Board simulatedBoard = boardClone.clone();
             for (Move move : moveSequence) {
                 simulatedBoard.performMove(move);
             }
+            
+            ExpectiminimaxTask task = new ExpectiminimaxTask(simulatedBoard, 1, false, brick);
+            tasks.add(task);
+            task.fork(); // Start in parallel
+        }
 
-            // This function acts as depth 0, so start expectiminimax at depth 1
-            int moveValue = expectiminimax(simulatedBoard, 1, false, brick);
-
+        // Collect results and find the best move
+        for (int i = 0; i < tasks.size(); i++) {
+            int moveValue = tasks.get(i).join(); // Wait for computation
             if (moveValue > bestValue) {
                 bestValue = moveValue;
-                bestMove = moveSequence;
+                bestMove = possibleMoves.get(i);
             }
         }
 
@@ -56,40 +68,50 @@ public class AI extends Player {
             // Always evaluate the board form the perspective of the AI
             return evaluateBoard(board, this.brick);
         }
+        return new ExpectiminimaxTask(board, depth, maximizingPlayer, brick).compute();
+    }
 
-        int totalEval = 0;
+    private class ExpectiminimaxTask extends RecursiveTask<Integer> {
+        private final Board board;
+        private final int depth;
+        private final boolean maximizingPlayer;
+        private final Brick brick;
 
-        for (Roll roll : ALL_ROLLS) {
-            List<Move[]> possibleMoves = board.actions(roll.values, brick);
-
-            if (maximizingPlayer) {
-                // Our turn, trying to maximise our score
-                int maxEval = Integer.MIN_VALUE;
-                for (Move[] moveSequence : possibleMoves) {
-                    Board simulatedBoard = board.clone();
-                    for (Move move : moveSequence) {
-                        simulatedBoard.performMove(move);
-                    }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, false, brick.opponent());
-                    maxEval = Math.max(maxEval, eval);
-                }
-                totalEval += maxEval * roll.weight;
-            } else {
-                // The opponent's turn, trying to minimise our score
-                int minEval = Integer.MAX_VALUE;
-                for (Move[] moveSequence : possibleMoves) {
-                    Board simulatedBoard = board.clone();
-                    for (Move move : moveSequence) {
-                        simulatedBoard.performMove(move);
-                    }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick.opponent());
-                    minEval = Math.min(minEval, eval);
-                }
-                totalEval += minEval * roll.weight;
-            }
+        public ExpectiminimaxTask(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+            this.board = board;
+            this.depth = depth;
+            this.maximizingPlayer = maximizingPlayer;
+            this.brick = brick;
         }
 
-        return totalEval / NUM_ROLLS;
+        @Override
+        protected Integer compute() {
+            int totalEval = 0;
+
+            for (Roll roll : ALL_ROLLS) {
+                List<Move[]> possibleMoves = board.actions(roll.values, brick);
+                
+                int bestEval = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+                for (Move[] moveSequence : possibleMoves) {
+                    Board simulatedBoard = board.clone();
+                    for (Move move : moveSequence) {
+                        simulatedBoard.performMove(move);
+                    }
+
+                    int eval = expectiminimax(simulatedBoard, depth + 1, !maximizingPlayer, brick.opponent());
+
+                    if (maximizingPlayer) {
+                        bestEval = Math.max(bestEval, eval);
+                    } else {
+                        bestEval = Math.min(bestEval, eval);
+                    }
+                }
+
+                totalEval += bestEval * roll.weight;
+            }
+
+            return totalEval / NUM_ROLLS;
+        }
     }
 
     private static int evaluateBoard(Board board, Brick brick) {
@@ -99,16 +121,16 @@ public class AI extends Player {
        // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
 
         // Calculate pip loss for for all possible moves
-       // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
+        aiScore += Math.sqrt( Evaluation.calculatePipLoss(board, brick)) /10;
 
         // Add scores for pieces in the home board
-        //aiScore += evaluateHomeBoard(board, brick;
+        aiScore += evaluateHomeBoard(board, brick);
 
         // Step 5: Blockade Evaluation
-        //aiScore += evaluateBlockades(board, brick);
+        aiScore += evaluateBlockades(board, brick);
 
         // Add scores for pieces borne off
-        //aiScore += board.getWinTrayCount(brick) * 10;
+        aiScore += board.getWinTrayCount(brick) * 10;
 
         // Prioritize stacking pieces
         aiScore += evaluateStacking(board, brick);
