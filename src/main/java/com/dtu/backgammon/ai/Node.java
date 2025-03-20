@@ -3,8 +3,6 @@ package com.dtu.backgammon.ai;
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
-import com.dtu.backgammon.player.Player;
-
 public class Node {
     private Move[] moveSequence;
     private Board board;

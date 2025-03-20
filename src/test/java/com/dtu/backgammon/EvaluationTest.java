@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Board.Point;
-import com.dtu.backgammon.ai.AI;
+import com.dtu.backgammon.ai.AI_ExpectiMax;
 import com.dtu.backgammon.ai.Evaluation;
 import com.dtu.backgammon.player.Player;
 
@@ -25,9 +25,9 @@ public class EvaluationTest {
     public void calculateBlotHitsForRollWhite() {
 
         List<Player> players = new ArrayList<>();
-        Player whitep = new AI(Brick.WHITE);
+        Player whitep = new AI_ExpectiMax(Brick.WHITE);
         players.add(whitep);
-        Player blackp = new AI(Brick.BLACK);
+        Player blackp = new AI_ExpectiMax(Brick.BLACK);
         players.add(blackp);
 
         //Dice dice = new Dice(2,3);
@@ -53,9 +53,9 @@ public class EvaluationTest {
     public void calculatePipLossBlackSingleMove() {
 
         List<Player> players = new ArrayList<>();
-        Player whitep = new AI(Brick.WHITE);
+        Player whitep = new AI_ExpectiMax(Brick.WHITE);
         players.add(whitep);
-        Player blackp = new AI(Brick.BLACK);
+        Player blackp = new AI_ExpectiMax(Brick.BLACK);
         players.add(blackp);
 
         Point[] points = new Point[24];
@@ -78,9 +78,9 @@ public class EvaluationTest {
     public void calculatePipLossBlackAll() {
 
         List<Player> players = new ArrayList<>();
-        Player whitep = new AI(Brick.WHITE);
+        Player whitep = new AI_ExpectiMax(Brick.WHITE);
         players.add(whitep);
-        Player blackp = new AI(Brick.BLACK);
+        Player blackp = new AI_ExpectiMax(Brick.BLACK);
         players.add(blackp);
 
         Point[] points = new Point[24];

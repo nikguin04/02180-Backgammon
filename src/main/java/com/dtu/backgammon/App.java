@@ -2,13 +2,12 @@ package com.dtu.backgammon;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import com.dtu.backgammon.Board.Brick;
-import com.dtu.backgammon.ai.AI;
+import com.dtu.backgammon.ai.AI_ExpectiMax;
+import com.dtu.backgammon.ai.AI_MonteCarlo;
 import com.dtu.backgammon.player.Human;
 
 /**
@@ -60,20 +59,21 @@ public class App {
 
     static void setupPlayers(Board board) {
         // Initialize players
-        Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
+        Pattern playerPattern = Pattern.compile("(human|ai_expectimax|ai_montecarlo)", Pattern.CASE_INSENSITIVE);
         for (Brick brick : Brick.values()) {
             if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
 
-            System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
+            System.out.println("Please choose a player for " + brick.name() + " (Human / AI_expectimax / AI_montecarlo):");
             while (!scanner.hasNext(playerPattern)) {
                 scanner.next(); // Remove current input in scanner buffer
-                System.out.println("Please choose either (Human / AI)");
+                System.out.println("Please choose either (Human / AI_expectimax / AI_montecarlo)");
             }
             String playerType = scanner.next(playerPattern);
 
             switch (playerType.toLowerCase()) {
                 case "human" -> board.players.add(new Human(brick));
-                case "ai" -> board.players.add(new AI(brick));
+                case "ai_expectimax" -> board.players.add(new AI_ExpectiMax(brick));
+                case "ai_montecarlo" -> board.players.add(new AI_MonteCarlo(brick));
                 default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
             }
         }

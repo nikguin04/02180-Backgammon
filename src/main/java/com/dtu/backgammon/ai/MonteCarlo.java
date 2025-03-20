@@ -11,8 +11,8 @@ import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 
 public class MonteCarlo {
-    private static final int SIMULATION_COUNT = 1000;  // Number of simulations per move
-    private static final int MAX_DEPTH = 4;  // Max depth for simulations
+    private static final int SIMULATION_COUNT = 100;  // Number of simulations per move
+    private static final int MAX_DEPTH = 2;  // Max depth for simulations
 
     public static Move[] getBestMove(Board board, List<Integer> roll, Brick brick) {
         System.out.println(roll);
@@ -96,7 +96,7 @@ public class MonteCarlo {
         int totalVisits = node.getParent() == null ? visits : node.getParent().getTotalVisits();
 
         // The constant C controls the exploration-exploitation tradeoff
-        double C = 1.41;  // Example value, this can be tuned
+        double C = 1.41;  // 1.41 is a standard value for UCB
 
         // UCB formula
         double averageReward = (double) wins / visits;

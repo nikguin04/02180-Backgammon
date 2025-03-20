@@ -9,18 +9,18 @@ import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
-public class AI extends Player {
+public class AI_ExpectiMax extends Player {
 
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 1;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
 
-    public AI(Brick brick) {
+    public AI_ExpectiMax(Brick brick) {
         super(brick);
     }
 
 
-   /*
+
     @Override
     // Figure out the best first move, and then find the highest eval move
     public Move[] getMove(Board board, List<Integer> roll) {
@@ -53,14 +53,9 @@ public class AI extends Player {
         return bestMove;
     }
 
-    */
 
 
-    @Override
-    public Move[] getMove(Board board, List<Integer> roll) {
-        // Use MCTS to get the best sequence of moves
-        return MonteCarlo.getBestMove(board, roll, brick);
-    }
+
 
 
 
@@ -241,7 +236,7 @@ public class AI extends Player {
 
     @Override
     public String getName() {
-        return "AI";
+        return "AI_ExpectiMax";
     }
 
     public record Roll(int weight, List<Integer> values) {}

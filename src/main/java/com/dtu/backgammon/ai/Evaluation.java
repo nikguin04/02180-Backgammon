@@ -10,7 +10,7 @@ public class Evaluation {
 
     public static int calculateBlotHitsForAllRolls(Board board, Brick brick) {
         int hits = 0;
-        for (AI.Roll roll : AI.ALL_ROLLS) {
+        for (AI_ExpectiMax.Roll roll : AI_ExpectiMax.ALL_ROLLS) {
             hits += roll.weight() * calculateIfBlotHitForRoll(board, brick, roll.values());
         }
 
@@ -50,7 +50,7 @@ public class Evaluation {
 
     public static int calculatePipLoss(Board board, Brick brick) {
         int totalPiploss = 0;
-        for (AI.Roll roll : AI.ALL_ROLLS) {
+        for (AI_ExpectiMax.Roll roll : AI_ExpectiMax.ALL_ROLLS) {
             totalPiploss += roll.weight() * calculateTotalBlotPipLossForRoll(board, brick, roll.values());
         }
 
