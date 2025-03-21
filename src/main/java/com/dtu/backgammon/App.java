@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.ai.AI;
+import com.dtu.backgammon.ai.MonteCarlo;
 import com.dtu.backgammon.player.Human;
 
 /**
@@ -63,18 +64,19 @@ public class App {
         for (Brick brick : Brick.values()) {
             if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
 
-            System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
+            System.out.println("Please choose a player for " + brick.name() + " (Human / Expectiminimax / MonteCarlo):");
             while (!scanner.hasNext(playerPattern)) {
                 scanner.next(); // Remove current input in scanner buffer
-                System.out.println("Please choose either (Human / AI)");
+                System.out.println("Please choose either (Human / Expectiminimax / MonteCarlo)");
             }
             String playerType = scanner.next(playerPattern);
 
-            switch (playerType.toLowerCase()) {
-                case "human" -> board.players.add(new Human(brick));
-                case "ai" -> board.players.add(new AI(brick));
+            board.players.add(switch (playerType.toLowerCase()) {
+                case "human" -> new Human(brick);
+                case "expectiminimax" -> new AI(brick);
+                case "montecarlo" -> new MonteCarlo(brick);
                 default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
-            }
+            });
         }
         scanner.nextLine(); // Flush scanner
     }
