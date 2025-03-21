@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+*.csv
 log.txt
 
 # Package Files #
