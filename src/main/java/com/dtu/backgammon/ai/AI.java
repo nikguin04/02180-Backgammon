@@ -214,17 +214,23 @@ public class AI extends Player {
         // Simulate all dice rolls (1-6, 1-6)
         for (int die1 = 1; die1 <= 6; die1++) {
             for (int die2 = 1; die2 <= 6; die2++) {
-                int rollSum = die1 + die2;
 
-                // Check if any trapped checker can escape
+                // Check if any trapped checker can escape by using the dice rolls (in any order)
                 for (int position : trappedPositions) {
-                    int escapePoint = position + rollSum;
-
-                    if (escapePoint < 24) {
-                        Board.Point point = board.board[escapePoint];
-                        if (point.brick() != opponentBrick || point.count() < 2) {
-                            totalEscapeRolls++;
-                            break;  // Only count the best escape roll for a given move
+                    // Move by die1, then move by die2
+                    int firstMove = position + die1;
+                    if (firstMove < 24) {
+                        Board.Point firstPoint = board.board[firstMove];
+                        if (firstPoint.brick() != opponentBrick || firstPoint.count() < 2) {
+                            // If the first move is valid, try the second move (by die2)
+                            int secondMove = firstMove + die2;
+                            if (secondMove < 24) {
+                                Board.Point secondPoint = board.board[secondMove];
+                                if (secondPoint.brick() != opponentBrick || secondPoint.count() < 2) {
+                                    totalEscapeRolls++;  // Count the valid escape
+                                    break;  // Only count the best escape roll for a given move
+                                }
+                            }
                         }
                     }
                 }
@@ -233,7 +239,6 @@ public class AI extends Player {
 
         return totalEscapeRolls;
     }
-
     private static int evaluateStacking(Board board, Brick brick) {
         int stackingScore = 0;
         int[] anchorPoints = brick == Brick.BLACK ? new int[]{18, 19, 20} : new int[]{5, 4, 3};
