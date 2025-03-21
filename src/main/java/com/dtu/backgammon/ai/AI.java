@@ -10,7 +10,7 @@ import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
 public class AI extends Player {
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 1;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
 
@@ -96,23 +96,22 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-       // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
+        aiScore += (int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/36.0)*80);
 
         // Calculate pip loss for for all possible moves
-       // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
+        aiScore += (int) Math.round( (Evaluation.calculatePipLoss(board, brick)/1600.0)*50);
 
         // Add scores for pieces in the home board
-        //aiScore += evaluateHomeBoard(board, brick;
+        aiScore += (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*90);
 
         // Step 5: Blockade Evaluation
-        //aiScore += evaluateBlockades(board, brick);
+        aiScore += (int) Math.round((evaluateBlockades(board, brick)/98.0)*60);
 
         // Add scores for pieces borne off
-        //aiScore += board.getWinTrayCount(brick) * 10;
+        aiScore += (int) Math.round((board.getWinTrayCount(brick)/15.0)*50);
 
         // Prioritize stacking pieces
-        aiScore += evaluateStacking(board, brick);
-
+        aiScore += (int) Math.round((evaluateStacking(board, brick)/90.0)*100);
         return aiScore;
     }
     // Provide
