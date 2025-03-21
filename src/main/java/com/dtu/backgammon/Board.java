@@ -139,8 +139,8 @@ public class Board implements Cloneable {
                             moveList.add(move);
                             rollList.remove(Integer.valueOf(move.getRoll()));
                             try {
-                                App.writer.write(move.toString() + "\n");
-                                App.writer.flush();
+                                App.logWriter.write(move + "\n");
+                                App.logWriter.flush();
                             } catch (IOException e) {}
                             this.performMove(move);
                             Renderer.render(this); // Always render after a move :)
