@@ -15,7 +15,7 @@ public class AI extends Player {
     private static final int MAX_DEPTH = 2;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
-    
+
     private static final ForkJoinPool pool = new ForkJoinPool(); // Global thread pool
 
     public AI(Brick brick) {
@@ -33,7 +33,7 @@ public class AI extends Player {
 
         // For each possible set of moves, clone the board and perform the move sequence
         List<ExpectiminimaxTask> tasks = new ArrayList<>();
-        
+
         // Parallelize expectiminimax at depth 1
         for (Move[] moveSequence : possibleMoves) {
 
@@ -41,7 +41,8 @@ public class AI extends Player {
             for (Move move : moveSequence) {
                 simulatedBoard.performMove(move);
             }
-            
+
+            // This function acts as depth 0, so start expectiminimax at depth 1
             ExpectiminimaxTask task = new ExpectiminimaxTask(simulatedBoard, 1, false, brick);
             tasks.add(task);
             task.fork(); // Start in parallel
@@ -90,7 +91,7 @@ public class AI extends Player {
 
             for (Roll roll : ALL_ROLLS) {
                 List<Move[]> possibleMoves = board.actions(roll.values, brick);
-                
+
                 int bestEval = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
                     Board simulatedBoard = board.clone();
@@ -101,8 +102,10 @@ public class AI extends Player {
                     int eval = expectiminimax(simulatedBoard, depth + 1, !maximizingPlayer, brick.opponent());
 
                     if (maximizingPlayer) {
+                        // Our turn, trying to maximise our score
                         bestEval = Math.max(bestEval, eval);
                     } else {
+                        // The opponent's turn, trying to minimise our score
                         bestEval = Math.min(bestEval, eval);
                     }
                 }
@@ -120,8 +123,8 @@ public class AI extends Player {
         // Calculate blot hits for all possible roll
        // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
 
-        // Calculate pip loss for for all possible moves
-        aiScore += Math.sqrt( Evaluation.calculatePipLoss(board, brick)) /10;
+        // Calculate pip loss for all possible moves
+        aiScore += (int) (Math.sqrt(Evaluation.calculatePipLoss(board, brick)) / 10);
 
         // Add scores for pieces in the home board
         aiScore += evaluateHomeBoard(board, brick);
