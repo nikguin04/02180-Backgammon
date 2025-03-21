@@ -29,6 +29,9 @@ public class Board implements Cloneable {
         }
     }
 
+    private int turnCount;
+    private Brick winner;
+
     int winTrayWhite = 0;
     int winTrayBlack = 0;
 
@@ -116,6 +119,7 @@ public class Board implements Cloneable {
     }
 
     public void startGame() {
+        int turnCount = 0; // To track the number of turns
         outer:
         while (true) { // Outer loop will run until the game is over
             players:
@@ -127,7 +131,9 @@ public class Board implements Cloneable {
                 List<Move> moveList = new ArrayList<>();
 
                 while (!rollList.isEmpty()) {
-                    if (this.clone().actions(rollList, p.brick).isEmpty()) { continue players; }
+                    if (this.clone().actions(rollList, p.brick).isEmpty()) {
+                        continue players;
+                    }
 
                     Move[] moves = p.getMove(this, rollList);
                     for (Move move : moves) {
@@ -139,19 +145,29 @@ public class Board implements Cloneable {
                             moveList.add(move);
                             rollList.remove(Integer.valueOf(move.getRoll()));
                             try {
-                                App.logWriter.write(move + "\n");
-                                App.logWriter.flush();
+                                App.logWriter.write(move.toString() + "\n");
+                                //AI_Evaluation.moveLogWriter.flush();
                             } catch (IOException e) {}
+
                             this.performMove(move);
-                            Renderer.render(this); // Always render after a move :)
+                            Renderer.render(this); // Always render after a move
                         }
 
-                        if (isGameOver()) { break outer; }
+                        if (isGameOver()) {
+                            break outer;
+                        }
                     }
                 }
             }
+            turnCount++; // Increment turn count after each outer loop
         }
+
+        // Game is over, store the winner and turn count
         System.out.println("Congratulations " + getWinner() + ", you won the Game!!!");
+
+        // Set the winner and turn count for later use
+        this.setWinner(getWinner());
+        this.setTurnCount(turnCount);
     }
 
     public Brick getBrickAt(int column, int depth) {
@@ -342,5 +358,22 @@ public class Board implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }
+    }
+
+
+    public void setWinner(Brick winner) {
+        this.winner = winner;
+    }
+
+    public Brick returnWinner() {
+        return this.winner;
+    }
+
+    public void setTurnCount(int turnCount) {
+        this.turnCount = turnCount;
+    }
+
+    public int getTurnCount() {
+        return this.turnCount;
     }
 }

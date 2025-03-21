@@ -60,7 +60,7 @@ public class App {
 
     static void setupPlayers(Board board) {
         // Initialize players
-        Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
+        Pattern playerPattern = Pattern.compile("(human|expectiminimax|montecarlo)", Pattern.CASE_INSENSITIVE);
         for (Brick brick : Brick.values()) {
             if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
 

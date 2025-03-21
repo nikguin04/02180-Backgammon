@@ -12,7 +12,7 @@ import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
 public class MonteCarlo extends Player {
-    private static final int SIMULATION_COUNT = 100; // Number of simulations per move
+    private static final int SIMULATION_COUNT = 50; // Number of simulations per move
     private static final int MAX_DEPTH = 2; // Max depth for simulations
 
     public MonteCarlo(Board.Brick brick) {

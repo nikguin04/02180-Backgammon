@@ -129,22 +129,30 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-       // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
+        aiScore += (int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/36.0)*21);
 
         // Calculate pip loss for all possible moves
-        aiScore += (int) (Math.sqrt(Evaluation.calculatePipLoss(board, brick)) / 10);
+        //aiScore += (int) (Math.sqrt(Evaluation.calculatePipLoss(board, brick)) / 10);
 
         // Add scores for pieces in the home board
-        aiScore += evaluateHomeBoard(board, brick);
+        aiScore += (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
 
         // Step 5: Blockade Evaluation
-        aiScore += evaluateBlockades(board, brick);
+        aiScore += (int) Math.round((evaluateBlockades(board, brick)/98.0)*18);
 
         // Add scores for pieces borne off
-        aiScore += board.getWinTrayCount(brick) * 10;
+
+        aiScore += (int) Math.round((board.getWinTrayCount(brick)/15.0)*15);
 
         // Prioritize stacking pieces
-        aiScore += evaluateStacking(board, brick);
+        aiScore += (int) Math.round((evaluateStacking(board, brick)/90.0)*26);
+
+        // Check if the home board count is 15 to prioritize bearing off
+        if (board.getHomeBoardCount(brick) == 15) {
+            // Boost the bearing off priority score when the home board count is 15
+            aiScore += 100;
+        }
+
 
         return aiScore;
     }
