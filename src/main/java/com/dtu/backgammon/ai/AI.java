@@ -64,12 +64,12 @@ public class AI extends Player {
         return bestMove;
     }
 
-    private int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+    private int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick, int alpha, int beta) {
         if (depth >= MAX_DEPTH || board.isGameOver()) {
             // Always evaluate the board form the perspective of the AI
             return evaluateBoard(board, this.brick);
         }
-        return new ExpectiminimaxTask(board, depth, maximizingPlayer, brick).compute();
+        return new ExpectiminimaxTask(board, depth, maximizingPlayer, brick, alpha, beta).compute();
     }
 
     private class ExpectiminimaxTask extends RecursiveTask<Integer> {
@@ -77,12 +77,16 @@ public class AI extends Player {
         private final int depth;
         private final boolean maximizingPlayer;
         private final Brick brick;
+        private int alpha;
+        private int beta;
 
-        public ExpectiminimaxTask(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+        public ExpectiminimaxTask(Board board, int depth, boolean maximizingPlayer, Brick brick, int alpha, int beta) {
             this.board = board;
             this.depth = depth;
             this.maximizingPlayer = maximizingPlayer;
             this.brick = brick;
+            this.alpha = alpha;
+            this.beta = beta;
         }
 
         @Override
@@ -99,15 +103,19 @@ public class AI extends Player {
                         simulatedBoard.performMove(move);
                     }
 
-                    int eval = expectiminimax(simulatedBoard, depth + 1, !maximizingPlayer, brick.opponent());
+                    int eval = expectiminimax(simulatedBoard, depth + 1, !maximizingPlayer, brick.opponent(), alpha, beta);
 
                     if (maximizingPlayer) {
                         // Our turn, trying to maximise our score
                         bestEval = Math.max(bestEval, eval);
+                        alpha = Math.max(alpha, eval);
                     } else {
                         // The opponent's turn, trying to minimise our score
                         bestEval = Math.min(bestEval, eval);
+                        beta = Math.min(beta, eval);
                     }
+                    // Prune if needed
+                    if (alpha >= beta) { break; }
                 }
 
                 totalEval += bestEval * roll.weight;
