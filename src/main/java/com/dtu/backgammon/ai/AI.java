@@ -19,23 +19,22 @@ public class AI extends Player {
     }
 
     @Override
-    // Figure out the best first move, and then find the highest eval move
     public Move[] getMove(Board board, List<Integer> roll) {
-        Board boardClone = board.clone();
         Move[] bestMove = null;
         int bestValue = Integer.MIN_VALUE;
 
-        List<Move[]> possibleMoves = boardClone.actions(roll, brick);
+        List<Move[]> possibleMoves = board.actions(roll, brick);
 
-        //For each move in possible moves, clone the board and perform the move
         for (Move[] moveSequence : possibleMoves) {
-
-            Board simulatedBoard = boardClone.clone();
             for (Move move : moveSequence) {
-                simulatedBoard.performMove(move);
+                board.performMove(move);
             }
 
-            int moveValue = expectiminimax(simulatedBoard, 0, true, brick);
+            int moveValue = expectiminimax(board, 0, true, brick, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+            for (Move move : moveSequence) {
+                board.undoMove(move);
+            }
 
             if (moveValue > bestValue) {
                 bestValue = moveValue;
@@ -50,7 +49,7 @@ public class AI extends Player {
         return bestMove;
     }
 
-    private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick) {
+    private static int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick, int alpha, int beta) {
         if (depth >= MAX_DEPTH || board.isGameOver()) {
             return evaluateBoard(board, brick);
         }
@@ -63,23 +62,35 @@ public class AI extends Player {
             if (maximizingPlayer) {
                 int maxEval = Integer.MIN_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
-                    Board simulatedBoard = board.clone();
                     for (Move move : moveSequence) {
-                        simulatedBoard.performMove(move);
+                        board.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, false, brick);
+                    int eval = expectiminimax(board, depth + 1, false, brick, alpha, beta);
+                    for (Move move : moveSequence) {
+                        board.undoMove(move);
+                    }
                     maxEval = Math.max(maxEval, eval);
+                    alpha = Math.max(alpha, eval);
+                    if (beta <= alpha) { // pruning happens here
+                        break;
+                    }
                 }
                 totalEval += maxEval * roll.weight;
             } else {
                 int minEval = Integer.MAX_VALUE;
                 for (Move[] moveSequence : possibleMoves) {
-                    Board simulatedBoard = board.clone();
                     for (Move move : moveSequence) {
-                        simulatedBoard.performMove(move);
+                        board.performMove(move);
                     }
-                    int eval = expectiminimax(simulatedBoard, depth + 1, true, brick);
+                    int eval = expectiminimax(board, depth + 1, true, brick, alpha, beta);
+                    for (Move move : moveSequence) {
+                        board.undoMove(move);
+                    }
                     minEval = Math.min(minEval, eval);
+                    beta = Math.min(beta, eval);
+                    if (beta <= alpha) { // pruning happens here
+                        break;
+                    }
                 }
                 totalEval += minEval * roll.weight;
             }
@@ -87,6 +98,7 @@ public class AI extends Player {
 
         return totalEval / NUM_ROLLS;
     }
+
 
     private static int evaluateBoard(Board board, Brick brick) {
         int aiScore = 0;

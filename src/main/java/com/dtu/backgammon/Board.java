@@ -270,6 +270,53 @@ public class Board implements Cloneable {
         return total;
     }
 
+    public void undoMove(Move move) {
+        if (move.isBearingOff()) {
+            Point fromPoint = board[move.from()];
+            if (move.brick() == Brick.WHITE) {
+                winTrayWhite--;
+                homeBoardWhite++;
+                maxHomeBoardWhite++;
+            } else if (move.brick() == Brick.BLACK) {
+                winTrayBlack--;
+                homeBoardBlack++;
+                maxHomeBoardBlack++;
+            }
+            board[move.from()] = fromPoint.withOneMore(move.brick());
+        } else {
+            Point toPoint = board[move.to()];
+            if (move.brick() == Brick.BLACK && move.to() <= 5 && move.from() > 5) {
+                homeBoardBlack--;
+            } else if (move.brick() == Brick.WHITE && move.to() >= 18 && move.from() < 18) {
+                homeBoardWhite--;
+            }
+            if (move.brick() == Brick.WHITE && toPoint.brick == Brick.BLACK && toPoint.count == 1) {
+                barBlack--;
+                board[move.to()] = new Point(Brick.BLACK, 1);
+                if (move.to() <= 5) {
+                    homeBoardBlack++;
+                }
+            } else if (move.brick() == Brick.BLACK && toPoint.brick == Brick.WHITE && toPoint.count == 1) {
+                barWhite--;
+                board[move.to()] = new Point(Brick.WHITE, 1);
+                if (move.to() >= 18) {
+                    homeBoardWhite++;
+                }
+            } else {
+                board[move.to()] = toPoint.withOneLess();
+            }
+            if (move.isReentry()) {
+                if (move.brick() == Brick.WHITE) {
+                    barWhite++;
+                } else if (move.brick() == Brick.BLACK) {
+                    barBlack++;
+                }
+            } else {
+                board[move.from()] = board[move.from()].withOneMore(move.brick());
+            }
+        }
+    }
+
     public boolean isGameOver() {
         return winTrayWhite == 15 || winTrayBlack == 15;
     }
