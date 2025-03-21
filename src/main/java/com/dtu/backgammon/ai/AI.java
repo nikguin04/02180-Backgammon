@@ -9,8 +9,14 @@ import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;
+
+
 public class AI extends Player {
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 1;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
 
@@ -92,29 +98,60 @@ public class AI extends Player {
         return totalEval / NUM_ROLLS;
     }
 
+
     private static int evaluateBoard(Board board, Brick brick) {
         int aiScore = 0;
 
-        // Calculate blot hits for all possible roll
-       // aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick)/20;
+        // Prepare CSV file for writing
+        String filePath = "evaluation_results2.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            // Write header if the file is empty
+            File file = new File(filePath);
 
-        // Calculate pip loss for for all possible moves
-       // aiScore += Evaluation.calculatePipLoss(board, brick)/5;
 
-        // Add scores for pieces in the home board
-        //aiScore += evaluateHomeBoard(board, brick;
+            // Calculate blot hits for all possible roll (15)
+            int blotHits = (int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/36.0)*70);
+            System.out.println("Raw Blot Hits: " + blotHits);
+            aiScore += blotHits;
 
-        // Step 5: Blockade Evaluation
-        //aiScore += evaluateBlockades(board, brick);
+            // Calculate pip loss for all possible moves (max. 100)
+            // int pipLoss = Evaluation.calculatePipLoss(board, brick);
+            // System.out.println("Raw Pip Loss: " + pipLoss);
+            // aiScore += pipLoss;
 
-        // Add scores for pieces borne off
-        //aiScore += board.getWinTrayCount(brick) * 10;
+            // Add scores for pieces in the home board (90)
+            int homeBoard =(int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*90);
+            System.out.println("Raw Home Board: " + homeBoard);
+            aiScore += homeBoard;
 
-        // Prioritize stacking pieces
-        aiScore += evaluateStacking(board, brick);
+            // Step 5: Blockade Evaluation (61)
+            int blockade = (int) Math.round((evaluateBlockades(board, brick)/98.0)*60);
+            System.out.println("Raw Blockade: " + blockade);
+            aiScore += blockade;
+
+            // Add scores for pieces borne off (15)
+            int borneOff = (int) Math.round((board.getWinTrayCount(brick)/15.0)*50);
+            System.out.println("Raw Borne Off: " + borneOff);
+            aiScore += borneOff;
+
+            // Prioritize stacking pieces (310)
+            int stacking = (int) Math.round((evaluateStacking(board, brick)/90.0)*100);
+            System.out.println("Raw Stacking: " + stacking);
+            aiScore += stacking;
+
+            System.out.println("Total AI Score: " + aiScore);
+
+            // Write the evaluation values to the CSV file
+            writer.write(String.format("%d, %d, %d, %d, %d\n", blotHits, homeBoard, blockade, borneOff, stacking));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return aiScore;
     }
+
+
+
     // Provide
     private static int evaluateBlockades(Board board, Brick brick) {
         int blockadeScore = 0;

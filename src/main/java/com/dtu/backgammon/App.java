@@ -1,82 +1,52 @@
 package com.dtu.backgammon;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.ai.AI;
-import com.dtu.backgammon.player.Human;
+import java.io.FileWriter;
 
-/**
- * Hello world!
- */
 public class App {
     public static Scanner scanner;
     public static FileWriter writer;
 
     public static void main(String[] args) throws IOException {
+        // Set up the CSV file for writing results
 
         writer = new FileWriter("log.txt");
 
-        scanner = new Scanner(System.in);
-        Board board = new Board();
-        setupPlayers(board);
-        board.startGame();
 
-        writer.close();
+            int totalGames = 10;
 
-        /*board.homeBoardWhite = 15;
-        board.setColumn(21, Brick.WHITE, 1);
-        board.setColumn(22, Brick.WHITE, 1);*/
+            // Loop to simulate 100 games
+            for (int i = 1; i <= totalGames; i++) {
+                Board board = new Board();
+                setupPlayers(board);
+                board.startGame();
 
-        /*board.barWhite = 1;
-        board.setColumn(21, Brick.WHITE, 1);
-        board.setColumn(9, Brick.WHITE, 3);
-
-        AI ai = (AI) board.players.get(0);
-
-        List<Move[]> actions = board.actions(List.of(2, 2, 2, 2), ai.brick);
-        for (Move[] action : actions) {
-            System.out.println(Arrays.toString(action));
-        }*/
-    }
-
-    private static void setupStandardCheckerSetup(Board board) {
-        // Set up the standard checker setup
-        board.setColumn(0, Brick.WHITE, 2);
-        board.setColumn(11, Brick.WHITE, 5);
-        board.setColumn(16, Brick.WHITE, 3);
-        board.setColumn(18, Brick.WHITE, 5);
-
-        board.setColumn(23, Brick.BLACK, 2);
-        board.setColumn(12, Brick.BLACK, 5);
-        board.setColumn(7, Brick.BLACK, 3);
-        board.setColumn(5, Brick.BLACK, 5);
-    }
-
-    static void setupPlayers(Board board) {
-        // Initialize players
-        Pattern playerPattern = Pattern.compile("(human|ai)", Pattern.CASE_INSENSITIVE);
-        for (Brick brick : Brick.values()) {
-            if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
-
-            System.out.println("Please choose a player for " + brick.name() + " (Human / AI):");
-            while (!scanner.hasNext(playerPattern)) {
-                scanner.next(); // Remove current input in scanner buffer
-                System.out.println("Please choose either (Human / AI)");
+                System.out.println("Game " + i + " complete.\n");
+                writer.close();
             }
-            String playerType = scanner.next(playerPattern);
 
-            switch (playerType.toLowerCase()) {
-                case "human" -> board.players.add(new Human(brick));
-                case "ai" -> board.players.add(new AI(brick));
-                default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
-            }
-        }
-        scanner.nextLine(); // Flush scanner
+        System.out.println("100 games complete. Results logged to 'evaluation_results.csv'.");
     }
+
+    private static void setupPlayers(Board board) {
+        // Initialize AI players for both sides (both players are AI)
+        board.players.clear(); // Clear previous players setup
+
+        System.out.println("AI vs AI setup");
+
+        // Setup AI for both WHITE and BLACK
+        board.players.add(new AI(Brick.WHITE));
+        board.players.add(new AI(Brick.BLACK));
+    }
+
+
+
+
 }
