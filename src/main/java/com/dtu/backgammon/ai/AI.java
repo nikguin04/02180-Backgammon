@@ -43,7 +43,7 @@ public class AI extends Player {
             }
 
             // This function acts as depth 0, so start expectiminimax at depth 1
-            ExpectiminimaxTask task = new ExpectiminimaxTask(simulatedBoard, 1, false, brick);
+            ExpectiminimaxTask task = new ExpectiminimaxTask(simulatedBoard, 1, false, brick, Integer.MIN_VALUE, Integer.MAX_VALUE);
             tasks.add(task);
             task.fork(); // Start in parallel
         }
