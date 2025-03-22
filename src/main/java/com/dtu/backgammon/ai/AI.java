@@ -25,105 +25,180 @@ public class AI extends Player {
     }
 
     @Override
-    // Figure out the best first move, and then find the highest eval move
     public Move[] getMove(Board board, List<Integer> roll) {
         Board boardClone = board.clone();
-        Move[] bestMove = null;
-        int bestValue = Integer.MIN_VALUE;
-
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
 
-        // For each possible set of moves, clone the board and perform the move sequence
+        if (possibleMoves.isEmpty()) {
+            throw new IllegalStateException("No valid move found!");
+        }
+
         List<ExpectiminimaxTask> tasks = new ArrayList<>();
 
-        // Parallelize expectiminimax at depth 1
+        // Start all branches in parallel, each child of MAX node
         for (Move[] moveSequence : possibleMoves) {
-
             Board simulatedBoard = boardClone.clone();
             for (Move move : moveSequence) {
                 simulatedBoard.performMove(move);
             }
 
-            // This function acts as depth 0, so start expectiminimax at depth 1
-            ExpectiminimaxTask task = new ExpectiminimaxTask(simulatedBoard, 1, false, brick, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            tasks.add(task);
-            task.fork(); // Start in parallel
+            tasks.add(new ExpectiminimaxTask(
+                    simulatedBoard,
+                    1,
+                    NodeType.CHANCE, // MAX node already handled here
+                    brick,
+                    Integer.MIN_VALUE,
+                    Integer.MAX_VALUE,
+                    moveSequence
+            ));
         }
 
-        // Collect results and find the best move
-        for (int i = 0; i < tasks.size(); i++) {
-            int moveValue = tasks.get(i).join(); // Wait for computation
-            if (moveValue > bestValue) {
-                bestValue = moveValue;
-                bestMove = possibleMoves.get(i);
+        // Collect results
+        Move[] bestMove = null;
+        int bestValue = Integer.MIN_VALUE;
+        for (ExpectiminimaxTask task : tasks) {
+            task.fork();
+        }
+        for (ExpectiminimaxTask task : tasks) {
+            int eval = task.join();
+            if (eval > bestValue) {
+                bestValue = eval;
+                bestMove = task.moveSequence; // Use the move sequence from the task itself
             }
-        }
-
-        if (bestMove == null) {
-            throw new IllegalStateException("No valid move found!");
         }
 
         return bestMove;
     }
 
-    private int expectiminimax(Board board, int depth, boolean maximizingPlayer, Brick brick, int alpha, int beta) {
-        if (depth >= MAX_DEPTH || board.isGameOver()) {
-            // Always evaluate the board form the perspective of the AI
-            return evaluateBoard(board, this.brick);
-        }
-        return new ExpectiminimaxTask(board, depth, maximizingPlayer, brick, alpha, beta).compute();
+//    private int expectiminimax(Board board, int depth,NodeType nodeType, Brick brick, int alpha, int beta) {
+//        if (depth >= MAX_DEPTH || board.isGameOver()) {
+//            // Always evaluate the board form the perspective of the AI
+//            return evaluateBoard(board, this.brick);
+//        }
+//        return new ExpectiminimaxTask(board, depth, nodeType, brick, alpha, beta).compute();
+//    }
+
+    private enum NodeType {
+        MAX, MIN, CHANCE
     }
 
     private class ExpectiminimaxTask extends RecursiveTask<Integer> {
         private final Board board;
         private final int depth;
-        private final boolean maximizingPlayer;
+        private final NodeType nodeType;
         private final Brick brick;
         private int alpha;
         private int beta;
+        private final Move[] moveSequence; // Only needed at the root level
 
-        public ExpectiminimaxTask(Board board, int depth, boolean maximizingPlayer, Brick brick, int alpha, int beta) {
+        public ExpectiminimaxTask(Board board, int depth, NodeType nodeType, Brick brick, int alpha, int beta, Move[] moveSequence) {
             this.board = board;
             this.depth = depth;
-            this.maximizingPlayer = maximizingPlayer;
+            this.nodeType = nodeType;
             this.brick = brick;
             this.alpha = alpha;
             this.beta = beta;
+            this.moveSequence = moveSequence;
         }
 
         @Override
         protected Integer compute() {
-            int totalEval = 0;
-
-            for (Roll roll : ALL_ROLLS) {
-                List<Move[]> possibleMoves = board.actions(roll.values, brick);
-
-                int bestEval = maximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-                for (Move[] moveSequence : possibleMoves) {
-                    Board simulatedBoard = board.clone();
-                    for (Move move : moveSequence) {
-                        simulatedBoard.performMove(move);
-                    }
-
-                    int eval = expectiminimax(simulatedBoard, depth + 1, !maximizingPlayer, brick.opponent(), alpha, beta);
-
-                    if (maximizingPlayer) {
-                        // Our turn, trying to maximise our score
-                        bestEval = Math.max(bestEval, eval);
-                        alpha = Math.max(alpha, eval);
-                    } else {
-                        // The opponent's turn, trying to minimise our score
-                        bestEval = Math.min(bestEval, eval);
-                        beta = Math.min(beta, eval);
-                    }
-                    // Prune if needed
-                    if (alpha >= beta) { break; }
-                }
-
-                totalEval += bestEval * roll.weight;
+            if (depth >= MAX_DEPTH || board.isGameOver()) {
+                return evaluateBoard(board, AI.this.brick);
             }
 
-            return totalEval / NUM_ROLLS;
+            switch (nodeType) {
+                case CHANCE:
+                    return handleChanceNode();
+                case MAX:
+                    return handleMaxNode();
+                case MIN:
+                    return handleMinNode();
+                default:
+                    throw new IllegalStateException("Unknown node type");
+            }
+        }
+
+        private int handleChanceNode() {
+            int totalEval = 0;
+            NodeType nextNodeType = (nodeType == NodeType.CHANCE) ? (depth % 2 == 0 ? NodeType.MAX : NodeType.MIN) : NodeType.CHANCE;
+            for (Roll roll : ALL_ROLLS) {
+                Board rollSimulatedBoard = board.clone();
+                totalEval += (new ExpectiminimaxTask(
+                        rollSimulatedBoard,
+                        depth + 1,
+                        nextNodeType,
+                        brick,
+                        alpha,
+                        beta,
+                        null
+                ).compute() * roll.weight) / NUM_ROLLS;
+            }
+            return totalEval;
+        }
+
+        private int handleMaxNode() {
+            int bestEval = Integer.MIN_VALUE;
+            List<Move[]> possibleMoves = board.actions(Arrays.asList(1, 2, 3, 4, 5, 6), brick);
+
+            if (possibleMoves.isEmpty()) {
+                return evaluateBoard(board, AI.this.brick);
+            }
+
+            for (Move[] moveSequence : possibleMoves) {
+                Board simulatedBoard = board.clone();
+                for (Move move : moveSequence) {
+                    simulatedBoard.performMove(move);
+                }
+
+                int eval = new ExpectiminimaxTask(
+                        simulatedBoard,
+                        depth + 1,
+                        NodeType.CHANCE,
+                        brick.opponent(),
+                        alpha,
+                        beta,
+                        null
+                ).compute();
+
+                bestEval = Math.max(bestEval, eval);
+                alpha = Math.max(alpha, eval);
+
+                if (alpha >= beta) break; // Prune
+            }
+            return bestEval;
+        }
+
+        private int handleMinNode() {
+            int bestEval = Integer.MAX_VALUE;
+            List<Move[]> possibleMoves = board.actions(Arrays.asList(1, 2, 3, 4, 5, 6), brick);
+
+            if (possibleMoves.isEmpty()) {
+                return evaluateBoard(board, AI.this.brick);
+            }
+
+            for (Move[] moveSequence : possibleMoves) {
+                Board simulatedBoard = board.clone();
+                for (Move move : moveSequence) {
+                    simulatedBoard.performMove(move);
+                }
+
+                int eval = new ExpectiminimaxTask(
+                        simulatedBoard,
+                        depth + 1,
+                        NodeType.CHANCE,
+                        brick.opponent(),
+                        alpha,
+                        beta,
+                        null
+                ).compute();
+
+                bestEval = Math.min(bestEval, eval);
+                beta = Math.min(beta, eval);
+
+                if (alpha >= beta) break; // Prune
+            }
+            return bestEval;
         }
     }
 
