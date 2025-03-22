@@ -135,7 +135,7 @@ public class AI extends Player {
         aiScore += blothits;
 
         // Calculate pip loss for all possible moves
-        int piploss = (int) Math.sqrt(Evaluation.calculatePipLoss(board, brick.opponent()) / AI.ALL_ROLLS.length); // Root of pip loss, divided by amt of rolls
+        int piploss = Evaluation.calculatePipLoss(board, brick.opponent())*2;
         aiScore += piploss;
 
         // Add scores for pieces in the home board
@@ -153,7 +153,7 @@ public class AI extends Player {
         
 
         // Prioritize stacking pieces
-        int stacking = (int) Math.round((evaluateStacking(board, brick)));
+        int stacking = (evaluateStacking(board, brick));
         aiScore += stacking;
 
         // Check if the home board count is 15 to prioritize bearing off
