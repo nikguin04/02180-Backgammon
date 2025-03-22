@@ -1,6 +1,7 @@
 package com.dtu.backgammon;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class EvaluationTest {
         board.setColumn(17, Brick.BLACK, 1);
 
         int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick.opponent());
-        Assertions.assertEquals(13, hits);
+        assertEquals(13, hits);
     }
 
 
@@ -70,7 +71,7 @@ public class EvaluationTest {
 
         List<Integer> roll = List.of(2, 3);
         int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
-        Assertions.assertEquals(21, pipLoss);
+        assertEquals(21, pipLoss);
     }
 
 
@@ -97,6 +98,6 @@ public class EvaluationTest {
 
 
         int pipLoss = Evaluation.calculatePipLoss(board, blackp.brick);
-        Assertions.assertEquals(60, pipLoss);
+        assertEquals(60, pipLoss);
     }
 }

@@ -135,7 +135,8 @@ public class AI extends Player {
         aiScore += blothits;
 
         // Calculate pip loss for all possible moves
-        //aiScore += (int) Math.sqrt(Evaluation.calculatePipLoss(board, brick.opponent()) / AI.ALL_ROLLS.length); // Root of pip loss, divided by amt of rolls
+        int piploss = (int) Math.sqrt(Evaluation.calculatePipLoss(board, brick.opponent()) / AI.ALL_ROLLS.length); // Root of pip loss, divided by amt of rolls
+        aiScore += piploss;
 
         // Add scores for pieces in the home board
         int homeboard = (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
@@ -152,7 +153,7 @@ public class AI extends Player {
         
 
         // Prioritize stacking pieces
-        int stacking = (int) Math.round((evaluateStacking(board, brick)/90.0)*26);
+        int stacking = (int) Math.round((evaluateStacking(board, brick)));
         aiScore += stacking;
 
         // Check if the home board count is 15 to prioritize bearing off
@@ -161,7 +162,7 @@ public class AI extends Player {
             aiScore += 100;
         }
         try {
-        App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, 0, homeboard, blockades, wintray, stacking));
+        App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, piploss, homeboard, blockades, wintray, stacking));
         } catch (Exception e) {System.err.println("Failed to log eval");}
 
         return aiScore;

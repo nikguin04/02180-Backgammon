@@ -24,7 +24,7 @@ public class Board implements Cloneable {
             return new Point(count > 1 ? brick : Brick.NONE, count - 1);
         }
         public Point withOneMore(Brick brick) {
-            assert count > 0;
+            assert count >= 0;
             return new Point(brick, count + 1);
         }
     }
