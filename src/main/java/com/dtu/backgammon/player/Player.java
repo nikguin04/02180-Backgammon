@@ -7,6 +7,7 @@ import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 
 public abstract class Player {
+    public int totalMoveValue = 0;
     final public Brick brick;
     public Player(Brick brick) {
         this.brick = brick;

@@ -25,6 +25,14 @@ public class Dice {
         }
     }
 
+    public int getTotalMoveValue() {
+        int count = 0;
+        for (int move : this.getMoves()) {
+            count += move;
+        }
+        return count;
+    }
+
     public void displayDices() {
         System.out.println("Dice Roll: " + eyesDye1 + " & " + eyesDye2);
     }
