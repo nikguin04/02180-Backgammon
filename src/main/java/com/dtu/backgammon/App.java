@@ -17,21 +17,24 @@ import com.dtu.backgammon.player.Human;
 public class App {
     public static Scanner scanner;
     public static Writer logWriter;
+    public static boolean enableEvalWriter = false;
     public static Writer evalWriter;
 
     public static void main(String[] args) throws IOException {
 
         logWriter = new FileWriter("log.txt");
-        evalWriter = new FileWriter("eval.csv");
-        evalWriter.write("brick,blot,piploss,homeboard,blockades,wintray,stacking\n"); // Suboptimal, but works
+        if (enableEvalWriter) {
+            evalWriter = new FileWriter("eval.csv");
+            evalWriter.write("brick,blot,piploss,homeboard,blockades,wintray,stacking\n"); // Suboptimal, but works
+        }
 
         scanner = new Scanner(System.in);
         Board board = new Board();
         setupPlayers(board);
         board.startGame();
 
-        evalWriter.close();
         logWriter.close();
+        if (enableEvalWriter) { evalWriter.close(); }
 
         /*board.homeBoardWhite = 15;
         board.setColumn(21, Brick.WHITE, 1);

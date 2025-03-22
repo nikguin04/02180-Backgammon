@@ -236,9 +236,13 @@ public class AI extends Player {
             // Boost the bearing off priority score when the home board count is 15
             aiScore += 100;
         }
-        try {
-        App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, piploss, homeboard, blockades, wintray, stacking));
-        } catch (Exception e) {System.err.println("Failed to log eval");}
+        if (App.enableEvalWriter) {
+            try {
+                App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, piploss, homeboard, blockades, wintray, stacking));
+            } catch (Exception e) {
+                System.err.println("Failed to log eval");
+            }
+        }
 
         return aiScore;
     }
