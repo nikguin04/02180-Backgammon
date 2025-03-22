@@ -37,14 +37,14 @@ public class EvaluationTest {
             points[i] = new Point(Brick.NONE, 0);
         }
         Board board = new Board(points, players);
-        board.setColumn(10, Brick.WHITE, 1);
-        board.setColumn(14, Brick.WHITE, 1);
+        board.setColumn(5, Brick.WHITE, 1);
+        board.setColumn(15, Brick.WHITE, 1);
 
         board.setColumn(12, Brick.BLACK, 1);
         board.setColumn(13, Brick.BLACK, 1);
         board.setColumn(17, Brick.BLACK, 1);
 
-        int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick);
+        int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick.opponent());
         Assertions.assertEquals(13, hits);
     }
 

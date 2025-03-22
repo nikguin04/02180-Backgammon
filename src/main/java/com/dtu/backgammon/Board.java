@@ -353,6 +353,17 @@ public class Board implements Cloneable {
         return moves;
     }
 
+    public List<Integer> getBlots(Brick brick) {
+        List<Integer> blotCols = new ArrayList<>();
+        for (int i = 0; i < board.length; i++) {
+            Point p = board[i];
+            if (p.brick == brick && p.count == 1) {
+                blotCols.add(i);
+            }
+        }
+        return blotCols;
+    }
+
     @Override
     public Board clone() {
         try {

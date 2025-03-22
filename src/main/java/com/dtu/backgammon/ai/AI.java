@@ -9,6 +9,7 @@ import java.util.concurrent.RecursiveTask;
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
+import com.dtu.backgammon.ai.AI.Roll;
 import com.dtu.backgammon.player.Player;
 
 public class AI extends Player {
@@ -129,10 +130,10 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-        aiScore += (int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/36.0)*21);
+        aiScore += Evaluation.calculateBlotHitsForAllRolls(board, brick);
 
         // Calculate pip loss for all possible moves
-        //aiScore += (int) (Math.sqrt(Evaluation.calculatePipLoss(board, brick)) / 10);
+        //aiScore += (int) Math.sqrt(Evaluation.calculatePipLoss(board, brick.opponent()) / AI.ALL_ROLLS.length); // Root of pip loss, divided by amt of rolls
 
         // Add scores for pieces in the home board
         aiScore += (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
