@@ -24,7 +24,13 @@ public class Human extends Player {
 
         while (true) {
             System.out.println(brick.name() + " To move with " + roll.toString());
-            System.out.println("Enter your move (e.g., 'from to'): ");
+
+            System.out.println("Valid move formats:");
+            System.out.println("\tNormal move: (FROM TO), ex white moving from 1 to 5: (1 5)");
+            System.out.println("\tReentry move: (B TO), ex black reentry to 22: (B 22)");
+            System.out.println("\tBearing out move: (FROM W ROLL), ex white bearing out from 21 using dice 5: (21 W 5)");
+
+            System.out.println("Enter your move: ");
             moveInput = scanner.nextLine();
 
             // Validate the input format

@@ -1,6 +1,7 @@
 package com.dtu.backgammon;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,40 +38,15 @@ public class EvaluationTest {
             points[i] = new Point(Brick.NONE, 0);
         }
         Board board = new Board(points, players);
-        board.setColumn(10, Brick.WHITE, 1);
-        board.setColumn(14, Brick.WHITE, 1);
+        board.setColumn(5, Brick.WHITE, 1);
+        board.setColumn(15, Brick.WHITE, 1);
 
         board.setColumn(12, Brick.BLACK, 1);
         board.setColumn(13, Brick.BLACK, 1);
         board.setColumn(17, Brick.BLACK, 1);
 
-        int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick);
-        Assertions.assertEquals(13, hits);
-    }
-
-
-    @Test
-    public void calculatePipLossBlackSingleMove() {
-
-        List<Player> players = new ArrayList<>();
-        Player whitep = new AI(Brick.WHITE);
-        players.add(whitep);
-        Player blackp = new AI(Brick.BLACK);
-        players.add(blackp);
-
-        Point[] points = new Point[24];
-        for (int i = 0; i < 24; i++) {
-            points[i] = new Point(Brick.NONE, 0);
-        }
-        Board board = new Board(points, players);
-        board.setColumn(10, Brick.WHITE, 1);
-
-        board.setColumn(12, Brick.BLACK, 1);
-        board.setColumn(13, Brick.BLACK, 1);
-
-        List<Integer> roll = List.of(2, 3);
-        int pipLoss = Evaluation.calculateTotalBlotPipLossForRoll(board, whitep.brick, roll);
-        Assertions.assertEquals(21, pipLoss);
+        int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick.opponent());
+        assertEquals(13, hits);
     }
 
 
@@ -89,14 +65,41 @@ public class EvaluationTest {
         }
         Board board = new Board(points, players);
         board.setColumn(10, Brick.WHITE, 1);
-        //board.setColumn(14, Brick.WHITE, 1);
+        board.setColumn(14, Brick.WHITE, 1);
 
         //board.setColumn(12, Brick.BLACK, 1);
-        //board.setColumn(13, Brick.BLACK, 1);
+        board.setColumn(13, Brick.BLACK, 1);
         board.setColumn(17, Brick.BLACK, 1);
 
 
         int pipLoss = Evaluation.calculatePipLoss(board, blackp.brick);
-        Assertions.assertEquals(60, pipLoss);
+        assertEquals(18, pipLoss);
+    }
+
+    @Test
+    public void calculatePipLossWhiteAll() {
+
+        List<Player> players = new ArrayList<>();
+        Player whitep = new AI(Brick.WHITE);
+        players.add(whitep);
+        Player blackp = new AI(Brick.BLACK);
+        players.add(blackp);
+
+        Point[] points = new Point[24];
+        for (int i = 0; i < 24; i++) {
+            points[i] = new Point(Brick.NONE, 0);
+        }
+        Board board = new Board(points, players);
+        board.setColumn(0, Brick.WHITE, 1);
+        board.setColumn(10, Brick.WHITE, 1);
+        board.setColumn(14, Brick.WHITE, 5);
+
+        board.setColumn(12, Brick.BLACK, 3);
+        board.setColumn(13, Brick.BLACK, 2);
+        board.setColumn(17, Brick.BLACK, 1);
+
+
+        int pipLoss = Evaluation.calculatePipLoss(board, whitep.brick);
+        assertEquals(16, pipLoss);
     }
 }

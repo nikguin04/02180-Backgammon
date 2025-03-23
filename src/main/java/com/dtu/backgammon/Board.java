@@ -24,7 +24,7 @@ public class Board implements Cloneable {
             return new Point(count > 1 ? brick : Brick.NONE, count - 1);
         }
         public Point withOneMore(Brick brick) {
-            assert count > 0;
+            assert count >= 0;
             return new Point(brick, count + 1);
         }
     }
@@ -118,7 +118,7 @@ public class Board implements Cloneable {
         board[column] = new Point(player, count);
     }
 
-    public void startGame() {
+    public void startGame() throws IOException {
         int turnCount = 0; // To track the number of turns
         outer:
         while (true) { // Outer loop will run until the game is over
@@ -127,6 +127,7 @@ public class Board implements Cloneable {
                 Renderer.render(this);
                 Dice d = new Dice();
                 int[] roll = d.rollDice();
+                p.totalMoveValue += d.getTotalMoveValue();
                 List<Integer> rollList = Arrays.stream(roll).boxed().collect(Collectors.toList());
                 List<Move> moveList = new ArrayList<>();
 
@@ -168,6 +169,9 @@ public class Board implements Cloneable {
         // Set the winner and turn count for later use
         this.setWinner(getWinner());
         this.setTurnCount(turnCount);
+
+        App.logWriter.write(players.get(0).brick.name() + " total move values:" + players.get(0).totalMoveValue + "\n");
+        App.logWriter.write(players.get(1).brick.name() + " total move values:" + players.get(1).totalMoveValue + "\n");
     }
 
     public Brick getBrickAt(int column, int depth) {
@@ -347,6 +351,17 @@ public class Board implements Cloneable {
             }
         }
         return moves;
+    }
+
+    public List<Integer> getBlots(Brick brick) {
+        List<Integer> blotCols = new ArrayList<>();
+        for (int i = 0; i < board.length; i++) {
+            Point p = board[i];
+            if (p.brick == brick && p.count == 1) {
+                blotCols.add(i);
+            }
+        }
+        return blotCols;
     }
 
     @Override

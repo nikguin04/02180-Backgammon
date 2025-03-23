@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
+import com.dtu.backgammon.App;
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
+import com.dtu.backgammon.ai.AI.Roll;
 import com.dtu.backgammon.player.Player;
 
 public class AI extends Player {
@@ -204,30 +206,43 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-        aiScore += (int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/36.0)*21);
+        int blothits = Evaluation.calculateBlotHitsForAllRolls(board, brick);
+        aiScore += blothits;
 
         // Calculate pip loss for all possible moves
-        //aiScore += (int) (Math.sqrt(Evaluation.calculatePipLoss(board, brick)) / 10);
+        int piploss = Evaluation.calculatePipLoss(board, brick.opponent())*2;
+        aiScore += piploss;
 
         // Add scores for pieces in the home board
-        aiScore += (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
+        int homeboard = (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
+        aiScore += homeboard;
 
         // Step 5: Blockade Evaluation
-        aiScore += (int) Math.round((evaluateBlockades(board, brick)/98.0)*18);
+        int blockades = (int) Math.round((evaluateBlockades(board, brick)/98.0)*18);
+        aiScore += blockades;
 
         // Add scores for pieces borne off
 
-        aiScore += (int) Math.round((board.getWinTrayCount(brick)/15.0)*15);
+        int wintray = (int) Math.round((board.getWinTrayCount(brick)/15.0)*15);
+        aiScore += wintray;
+        
 
         // Prioritize stacking pieces
-        aiScore += (int) Math.round((evaluateStacking(board, brick)/90.0)*26);
+        int stacking = (evaluateStacking(board, brick));
+        aiScore += stacking;
 
         // Check if the home board count is 15 to prioritize bearing off
         if (board.getHomeBoardCount(brick) == 15) {
             // Boost the bearing off priority score when the home board count is 15
             aiScore += 100;
         }
-
+        if (App.enableEvalWriter) {
+            try {
+                App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, piploss, homeboard, blockades, wintray, stacking));
+            } catch (Exception e) {
+                System.err.println("Failed to log eval");
+            }
+        }
 
         return aiScore;
     }
