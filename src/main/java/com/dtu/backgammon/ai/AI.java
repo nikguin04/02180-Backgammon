@@ -12,9 +12,13 @@ import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.ai.AI.Roll;
 import com.dtu.backgammon.player.Player;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;
 
 public class AI extends Player {
-    private static final int MAX_DEPTH = 2;
+    private static final int MAX_DEPTH = 4;
     public static final Roll[] ALL_ROLLS;
     public static final int NUM_ROLLS = 6 * 6;
 
@@ -206,29 +210,28 @@ public class AI extends Player {
         int aiScore = 0;
 
         // Calculate blot hits for all possible roll
-        int blothits = Evaluation.calculateBlotHitsForAllRolls(board, brick);
+        int blothits =(int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/21.0)*16);
         aiScore += blothits;
 
         // Calculate pip loss for all possible moves
-        int piploss = Evaluation.calculatePipLoss(board, brick.opponent())*2;
+        int piploss =(int) Math.round((Evaluation.calculatePipLoss(board, brick.opponent())/135.0)*15);
         aiScore += piploss;
 
         // Add scores for pieces in the home board
-        int homeboard = (int) Math.round( (evaluateHomeBoard(board, brick)/69.0)*21);
+        int homeboard = (int) Math.round((evaluateHomeBoard(board, brick)/75.0)*20);
         aiScore += homeboard;
 
         // Step 5: Blockade Evaluation
-        int blockades = (int) Math.round((evaluateBlockades(board, brick)/98.0)*18);
+        int blockades = (int) Math.round((evaluateBlockades(board, brick)/98.0)*10);
         aiScore += blockades;
 
         // Add scores for pieces borne off
-
-        int wintray = (int) Math.round((board.getWinTrayCount(brick)/15.0)*15);
+        int wintray = (int) Math.round((board.getWinTrayCount(brick)/15.0)*10);
         aiScore += wintray;
         
 
         // Prioritize stacking pieces
-        int stacking = (evaluateStacking(board, brick));
+        int stacking = (int) Math.round( (evaluateStacking(board, brick)/110.0)*29);
         aiScore += stacking;
 
         // Check if the home board count is 15 to prioritize bearing off
@@ -340,7 +343,7 @@ public class AI extends Player {
                 if (point.count() >= 2) {
                     stackingScore += 10; // Reward each stack equally
                 }
-                if (point.count() > 2 && Arrays.stream(anchorPoints).anyMatch(ap -> ap == index)) {
+                if (point.count() >= 2 && Arrays.stream(anchorPoints).anyMatch(ap -> ap == index)) {
                     stackingScore += (index == anchorPoints[0] ? 30 : 20); // Stronger anchor points get higher scores
                 }
             }
