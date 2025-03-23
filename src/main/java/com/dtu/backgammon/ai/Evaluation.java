@@ -45,7 +45,7 @@ public class Evaluation {
                     int fromPos = blotCol + dist * dir;
 
                     if (fromPos > -1 && fromPos < 24 && board.board[fromPos].brick() == brick.opponent()) { // Frompos within range and contains enemy
-                        totalPiploss += (double)roll.weight()/AI.ALL_ROLLS.length * (brick == Brick.WHITE ? fromPos : 23-fromPos); // Return weighed x piploss for white, or 23-x piploss for black (reversed direction)
+                        totalPiploss += (double)roll.weight()/36 * (brick == Brick.WHITE ? fromPos : 23-fromPos); // Return weighed x piploss for white, or 23-x piploss for black (reversed direction)
                         break newroll;
                     }
                 }
