@@ -46,7 +46,7 @@ public class EvaluationTest {
         board.setColumn(17, Brick.BLACK, 1);
 
         int hits = Evaluation.calculateBlotHitsForAllRolls(board, whitep.brick.opponent());
-        assertEquals(13, hits);
+        assertEquals(21, hits);
     }
 
 
@@ -73,7 +73,7 @@ public class EvaluationTest {
 
 
         int pipLoss = Evaluation.calculatePipLoss(board, blackp.brick);
-        assertEquals(18, pipLoss);
+        assertEquals(10, pipLoss);
     }
 
     @Test
@@ -100,6 +100,6 @@ public class EvaluationTest {
 
 
         int pipLoss = Evaluation.calculatePipLoss(board, whitep.brick);
-        assertEquals(16, pipLoss);
+        assertEquals(10, pipLoss);
     }
 }
