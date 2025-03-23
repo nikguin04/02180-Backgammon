@@ -21,7 +21,7 @@ public class Evaluation {
                     int fromPos = blotCol + dist * dir;
 
                     if (fromPos > -1 && fromPos < 24 && board.board[fromPos].brick() == brick.opponent()) { // Frompos within range and contains enemy
-                        hits++;
+                        hits += roll.weight();
                         break newroll;
                     }
                 }
