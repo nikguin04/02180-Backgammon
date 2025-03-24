@@ -20,6 +20,6 @@ public record Move(int from, int to, MoveType movetype, Brick brick) {
     }
     @Override
     public String toString() {
-        return brick + " Move from " + from + " to " + to + " as " + movetype.name();
+        return "(" + brick.name().charAt(0) + " " + (isReentry() ? "bar" : from) + " → " + (isBearingOff() ? "home" : to) + ")";
     }
 }

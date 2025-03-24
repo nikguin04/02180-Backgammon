@@ -26,6 +26,7 @@ public class AI extends Player {
 
     @Override
     public Move[] getMove(Board board, List<Integer> roll) {
+        System.out.print("[" + brick + " AI] I rolled " + roll);
         Board boardClone = board.clone();
         List<Move[]> possibleMoves = boardClone.actions(roll, brick);
 
@@ -66,6 +67,9 @@ public class AI extends Player {
                 bestMove = task.moveSequence; // Use the move sequence from the task itself
             }
         }
+
+        System.out.println(" and I choose to do " + Arrays.toString(bestMove));
+        //try { Thread.sleep(500); } catch (InterruptedException ignored) {}
 
         return bestMove;
     }
