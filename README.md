@@ -133,3 +133,7 @@ For PowerShell:
 
 Below is a picture of what the game should NOT look like, and it is recommended to use a newer terminal.
 ![garble.png](res/garble.png)
+
+
+### Logging
+The logging for each game with both moves and total pips can be found at "log.txt" in the working directory
