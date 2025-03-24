@@ -1,6 +1,5 @@
 package com.dtu.backgammon;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,7 +117,7 @@ public class Board implements Cloneable {
         board[column] = new Point(player, count);
     }
 
-    public void startGame() throws IOException {
+    public void startGame() {
         int turnCount = 0; // To track the number of turns
         outer:
         while (true) { // Outer loop will run until the game is over
@@ -145,11 +144,7 @@ public class Board implements Cloneable {
                         if (valid) {
                             moveList.add(move);
                             rollList.remove(Integer.valueOf(move.getRoll()));
-                            try {
-                                App.logWriter.write(move.toString() + "\n");
-                                //AI_Evaluation.moveLogWriter.flush();
-                            } catch (IOException e) {}
-
+                            Logger.write(move + "\n");
                             this.performMove(move);
                             Renderer.render(this); // Always render after a move
                         }
@@ -170,8 +165,8 @@ public class Board implements Cloneable {
         this.setWinner(getWinner());
         this.setTurnCount(turnCount);
 
-        App.logWriter.write(players.get(0).brick.name() + " total move values:" + players.get(0).totalMoveValue + "\n");
-        App.logWriter.write(players.get(1).brick.name() + " total move values:" + players.get(1).totalMoveValue + "\n");
+        Logger.write(players.get(0).brick.name() + " total move values:" + players.get(0).totalMoveValue + "\n");
+        Logger.write(players.get(1).brick.name() + " total move values:" + players.get(1).totalMoveValue + "\n");
     }
 
     public Brick getBrickAt(int column, int depth) {

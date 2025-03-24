@@ -2,6 +2,7 @@ package com.dtu.backgammon;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -16,11 +17,11 @@ public class AI_Evaluation {
 
     private static final int NUM_GAMES = 5; // Number of games to simulate
     private static final Random RANDOM = new Random();
-    public static FileWriter moveLogWriter;  // Declare writer here so it can be used globally
-    public static FileWriter resultLogWriter;
+    public static Writer resultLogWriter;
+
     public static void main(String[] args) throws IOException {
         // Initialize FileWriter here before starting the games
-        moveLogWriter = new FileWriter("log.txt");
+        Logger.init("log.txt");
         resultLogWriter = new FileWriter("game_results.csv");
         resultLogWriter.write("Game,Winner,Turns,Expectimax_Wins,MonteCarlo_Wins\n");
 
@@ -59,8 +60,9 @@ public class AI_Evaluation {
             }
         }
 
-        resultLogWriter.close();  // Make sure to close the writer after the loop finishes
-        moveLogWriter.close();
+        // Make sure to close the writers after the loop finishes
+        resultLogWriter.close();
+        Logger.close();
         System.out.println("Simulation complete. Results saved in game_results.csv.");
     }
 
