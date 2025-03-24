@@ -181,7 +181,7 @@ public class AI extends Player {
             int aiScore = 0;
 
             // Calculate blot hits for all possible roll
-            int blothits =(int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick)/21.0)*16);
+            int blothits =(int) Math.round((Evaluation.calculateBlotHitsForAllRolls(board, brick.opponent())/21.0)*16);
             aiScore += blothits;
 
             // Calculate pip loss for all possible moves
