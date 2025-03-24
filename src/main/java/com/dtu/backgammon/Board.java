@@ -1,9 +1,7 @@
 package com.dtu.backgammon;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.dtu.backgammon.player.Player;
 
@@ -28,8 +26,7 @@ public class Board implements Cloneable {
         }
     }
 
-    private int turnCount;
-    private Brick winner;
+    int turns;
 
     int winTrayWhite = 0;
     int winTrayBlack = 0;
@@ -119,51 +116,43 @@ public class Board implements Cloneable {
 
     public void startGame() {
         int turnCount = 0; // To track the number of turns
+        Dice dice = new Dice();
         outer:
         while (true) { // Outer loop will run until the game is over
+            turns++;
             players:
             for (Player p : players) {
                 Renderer.render(this);
-                Dice d = new Dice();
-                int[] roll = d.rollDice();
-                p.totalMoveValue += d.getTotalMoveValue();
-                List<Integer> rollList = Arrays.stream(roll).boxed().collect(Collectors.toList());
-                List<Move> moveList = new ArrayList<>();
+                List<Integer> roll = dice.rollDice();
+                p.totalMoveValue += dice.getTotalMoveValue();
 
-                while (!rollList.isEmpty()) {
-                    if (this.clone().actions(rollList, p.brick).isEmpty()) {
+                rolls:
+                while (!roll.isEmpty()) {
+                    if (this.clone().actions(roll, p.brick).isEmpty()) {
+                        System.out.println("You can't do anything, skipping turn");
+                        Logger.write("Skipped " + p.brick.name() + "'s turn\n");
+                        //try { Thread.sleep(500); } catch (InterruptedException ignored) {}
                         continue players;
                     }
 
-                    Move[] moves = p.getMove(this, rollList);
+                    Move[] moves = p.getMove(this, roll);
                     for (Move move : moves) {
-                        if (!rollList.contains(move.getRoll())) {
-                            continue;
-                        }
-                        boolean valid = this.isValidMove(move, p.brick, move.getRoll());
-                        if (valid) {
-                            moveList.add(move);
-                            rollList.remove(Integer.valueOf(move.getRoll()));
-                            Logger.write(move + "\n");
-                            this.performMove(move);
-                            Renderer.render(this); // Always render after a move
-                        }
+                        if (!roll.contains(move.getRoll())) { continue rolls; }
+                        if (!this.isValidMove(move, p.brick, move.getRoll())) { continue rolls; }
 
-                        if (isGameOver()) {
-                            break outer;
-                        }
+                        roll.remove(Integer.valueOf(move.getRoll()));
+                        Logger.write(move + "\n");
+                        this.performMove(move);
+                        Renderer.render(this); // Always render after a move :)
+
+                        if (isGameOver()) { break outer; }
                     }
                 }
             }
-            turnCount++; // Increment turn count after each outer loop
         }
 
-        // Game is over, store the winner and turn count
+        // Game is over, print the winner
         System.out.println("Congratulations " + getWinner() + ", you won the Game!!!");
-
-        // Set the winner and turn count for later use
-        this.setWinner(getWinner());
-        this.setTurnCount(turnCount);
 
         Logger.write(players.get(0).brick.name() + " total move values:" + players.get(0).totalMoveValue + "\n");
         Logger.write(players.get(1).brick.name() + " total move values:" + players.get(1).totalMoveValue + "\n");
@@ -368,22 +357,5 @@ public class Board implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }
-    }
-
-
-    public void setWinner(Brick winner) {
-        this.winner = winner;
-    }
-
-    public Brick returnWinner() {
-        return this.winner;
-    }
-
-    public void setTurnCount(int turnCount) {
-        this.turnCount = turnCount;
-    }
-
-    public int getTurnCount() {
-        return this.turnCount;
     }
 }

@@ -10,13 +10,14 @@ import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.Logger;
 import com.dtu.backgammon.Move;
-import com.dtu.backgammon.ai.Evaluation;
+import com.dtu.backgammon.Roll;
 import com.dtu.backgammon.player.Player;
+
+import static com.dtu.backgammon.Roll.ALL_ROLLS;
+import static com.dtu.backgammon.Roll.NUM_ROLLS;
 
 public class AI extends Player {
     private static final int MAX_DEPTH = 4;
-    public static final Roll[] ALL_ROLLS;
-    public static final int NUM_ROLLS = 6 * 6;
 
     private static final ForkJoinPool pool = new ForkJoinPool(); // Global thread pool
 
@@ -123,7 +124,7 @@ public class AI extends Player {
                         beta,
                         null // still root level, no sequence needed
                 ).computeWithRoll(roll);
-                totalEval += (eval * roll.weight) / NUM_ROLLS;
+                totalEval += (eval * roll.weight()) / NUM_ROLLS;
             }
             return totalEval;
         }
@@ -142,7 +143,7 @@ public class AI extends Player {
 
         private int handleMinMaxNode(boolean max, Roll roll) {
             int bestEval = max ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-            List<Move[]> possibleMoves = board.actions(roll.values, brick); // Pass roll values
+            List<Move[]> possibleMoves = board.actions(roll.values(), brick); // Pass roll values
 
             if (possibleMoves.isEmpty()) {
                 return evaluateBoard(board, AI.this.brick);
@@ -215,25 +216,8 @@ public class AI extends Player {
         }
     }
 
-        
-
     @Override
     public String getName() {
         return "AI";
-    }
-
-    public record Roll(int weight, List<Integer> values) {}
-
-    static {
-        ALL_ROLLS = new Roll[21];
-        int index = 0;
-        for (int i = 1; i <= 6; i++) {
-            ALL_ROLLS[index++] = new Roll(1, List.of(i, i, i, i));
-        }
-        for (int i = 1; i <= 6; i++) {
-            for (int j = 1; j < i; j++) {
-                ALL_ROLLS[index++] = new Roll(2, List.of(i, j));
-            }
-        }
     }
 }

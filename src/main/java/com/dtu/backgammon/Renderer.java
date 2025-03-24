@@ -8,19 +8,20 @@ import com.dtu.backgammon.player.Player;
 public class Renderer {
     // See ANSI commands https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
     public static void render(Board board) {
-        clearScreen(false);
+        showCursor(false);
         printBoard(board);
-        printPlayers(board.players);
+        System.out.print(ESC + "[J");
+        showCursor(true);
     }
 
-    static String barColor = "40;40;40";
-    static String lightTickColor = "125;106;54";
-    static String darkTickColor = "69;55;15";
+    static final String barColor = "64;64;64";
+    static final String lightTickColor = "125;106;54";
+    static final String darkTickColor = "69;55;15";
     private static void printBoard(Board board) {
         moveCur(0, 0);
-        for (int j = 11; j >= 0; j--) { // Print indexes for column
-            if (j == 5) { System.out.print("   "); } // Pad grey bar
-            System.out.printf("%3d", j);
+        for (int i = 11; i >= 0; i--) { // Print indexes for column
+            if (i == 5) { System.out.print("   "); } // Pad grey bar
+            System.out.printf("%3d", i);
         }
 
         System.out.println();
@@ -63,19 +64,12 @@ public class Renderer {
             System.out.println();
         }
         resetColor();
-        for (int j = 12; j < 24; j++) { // Print indexes for column
-            if (j == 18) { System.out.print("   "); } // Pad grey bar
-            System.out.printf("%3d", j);
+        for (int i = 12; i < 24; i++) { // Print indexes for column
+            if (i == 18) { System.out.print("   "); } // Pad grey bar
+            System.out.printf("%3d", i);
         }
-        // Temporary move cursor below board
+        // Move cursor below board
         moveCur(0, 16);
-    }
-
-    private static void printPlayers(List<Player> players) {
-        System.out.println();
-        for (int i = 0; i < players.size(); i++) {
-            System.out.print((i > 0 ? " Vs. " : "") + players.get(i).getName());
-        }
         System.out.println();
     }
 
@@ -93,8 +87,8 @@ public class Renderer {
     private static void setBackgroundColor() {
         System.out.print(ESC + "[m" + bcol(backgroundColor));
     }
-    private static void clearScreen(boolean keepColor) {
-        System.out.print((keepColor ? (ESC + "[m") : "") + ESC + "[2J");
+    public static void clearScreen() {
+        System.out.print(ESC + "[2J");
     }
     private static String bcol(String rgbcol) {
         return ESC + "[48;2;" + rgbcol + "m";
@@ -107,6 +101,9 @@ public class Renderer {
     }
     private static void moveCur(int x, int y) {
         System.out.print(ESC + String.format("[%d;%dH", y, x));
+    }
+    private static void showCursor(boolean show) {
+        System.out.print(ESC + "[?25" + (show ? "h" : "l"));
     }
 
     private static final char ESC = '\u001B';

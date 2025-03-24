@@ -6,8 +6,10 @@ import java.util.List;
 
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Dice;
-import com.dtu.backgammon.Move;
 import com.dtu.backgammon.Board.Brick;
+import com.dtu.backgammon.Roll;
+
+import static com.dtu.backgammon.Roll.ALL_ROLLS;
 
 public class Evaluation {
 
@@ -15,8 +17,8 @@ public class Evaluation {
         int hits = 0;
         List<Integer> blotCols = board.getBlots(brick);
         int dir = brick == Brick.WHITE ? Board.WHITE_DIR : Board.BLACK_DIR; // When brick moves towards its own direction, the dice rolls that are needed for oppenent to hit our player is equal to the amount we need to hit him
-        
-        for (AI.Roll roll : AI.ALL_ROLLS) {
+
+        for (Roll roll : ALL_ROLLS) {
             newroll:
             for (Integer blotCol: blotCols) {
                 for (int dist: new Dice(roll.values().get(0), roll.values().get(1)).getPossibleProgression() ) { // Gets possbile progression for roll (needs to convert to dice)
@@ -41,7 +43,7 @@ public class Evaluation {
 
         for (Integer blotCol: blotCols) {
             newblot:
-            for (AI.Roll roll : AI.ALL_ROLLS) {
+            for (Roll roll : ALL_ROLLS) {
                 newroll:
                 for(int dist: new Dice(roll.values().get(0), roll.values().get(1)).getPossibleProgression() ) { // Gets possbile progression for roll (needs to convert to dice)
                     int fromPos = blotCol + dist * dir;

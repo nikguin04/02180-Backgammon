@@ -2,12 +2,12 @@ package com.dtu.backgammon;
 
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 import com.dtu.backgammon.Board.Brick;
 import com.dtu.backgammon.ai.AI;
 import com.dtu.backgammon.ai.MonteCarlo;
 import com.dtu.backgammon.player.Human;
+import com.dtu.backgammon.player.Player;
 
 /**
  * Hello world!
@@ -26,6 +26,7 @@ public class App {
         scanner = new Scanner(System.in);
         Board board = new Board();
         setupPlayers(board);
+        Renderer.clearScreen();
         board.startGame();
 
         Logger.close();
@@ -61,24 +62,24 @@ public class App {
 
     static void setupPlayers(Board board) {
         // Initialize players
-        Pattern playerPattern = Pattern.compile("(human|expectiminimax|montecarlo)", Pattern.CASE_INSENSITIVE);
         for (Brick brick : Brick.values()) {
             if (brick == Brick.NONE) { continue; } // Do not initialize a player as no brick
 
             System.out.println("Please choose a player for " + brick.name() + " (Human / Expectiminimax / MonteCarlo):");
-            while (!scanner.hasNext(playerPattern)) {
-                scanner.next(); // Remove current input in scanner buffer
-                System.out.println("Please choose either (Human / Expectiminimax / MonteCarlo)");
+            Player player = null;
+            while (player == null) {
+                String playerType = scanner.nextLine().toLowerCase();
+                if ("human".startsWith(playerType)) {
+                    player = new Human(brick);
+                } else if ("expectiminimax".startsWith(playerType)) {
+                    player = new AI(brick);
+                } else if ("montecarlo".startsWith(playerType)) {
+                    player = new MonteCarlo(brick);
+                } else {
+                    System.out.println("Please choose either (Human / Expectiminimax / MonteCarlo)");
+                }
             }
-            String playerType = scanner.next(playerPattern);
-
-            board.players.add(switch (playerType.toLowerCase()) {
-                case "human" -> new Human(brick);
-                case "expectiminimax" -> new AI(brick);
-                case "montecarlo" -> new MonteCarlo(brick);
-                default -> throw new IllegalStateException("Failed to match input for player type: " + playerType);
-            });
+            board.players.add(player);
         }
-        scanner.nextLine(); // Flush scanner
     }
 }
