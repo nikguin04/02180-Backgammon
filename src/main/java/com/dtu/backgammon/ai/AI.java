@@ -111,7 +111,7 @@ public class AI extends Player {
 
         private int handleChanceNode() {
             int totalEval = 0;
-            NodeType nextNodeType = (depth % 4 == 3) ? NodeType.MAX : NodeType.MIN;
+            NodeType nextNodeType = ((depth + 1) % 2 == 0) ? NodeType.MIN : NodeType.MAX;
             for (Roll roll : ALL_ROLLS) {
                 Board rollSimulatedBoard = board.clone();
                 int eval = new ExpectiminimaxTask(
