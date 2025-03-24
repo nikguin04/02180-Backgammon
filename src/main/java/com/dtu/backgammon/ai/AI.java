@@ -74,8 +74,6 @@ public class AI extends Player {
         MAX, MIN, CHANCE
     }
 
-    public record Roll(int weight, List<Integer> values) {}
-
     private class ExpectiminimaxTask extends RecursiveTask<Integer> {
         private final Board board;
         private final int depth;
@@ -254,6 +252,8 @@ public class AI extends Player {
     public String getName() {
         return "AI";
     }
+
+    public record Roll(int weight, List<Integer> values) {}
 
     static {
         ALL_ROLLS = new Roll[21];
