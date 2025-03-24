@@ -158,7 +158,7 @@ public class AI extends Player {
                         alpha,
                         beta,
                         null
-                ).fork().join();
+                ).compute();
 
                 if (max) {
                     bestEval = Math.max(bestEval, eval);
