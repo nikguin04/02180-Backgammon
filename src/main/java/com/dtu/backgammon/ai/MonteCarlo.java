@@ -12,8 +12,8 @@ import com.dtu.backgammon.Move;
 import com.dtu.backgammon.player.Player;
 
 public class MonteCarlo extends Player {
-    private static final int SIMULATION_COUNT = 10000; // Number of simulations per move
-    private static final int MAX_DEPTH = 8; // Max depth for simulations
+    private static final int SIMULATION_COUNT = 5000; // Number of simulations per move
+
 
     public MonteCarlo(Board.Brick brick) {
         super(brick);
@@ -46,7 +46,7 @@ public class MonteCarlo extends Player {
 
         // Select the move sequence with the highest win rate
         Node bestNode = nodes.stream()
-            .max(Comparator.comparingDouble(MonteCarlo::ucbValue))
+            .max(Comparator.comparingDouble(MonteCarlo::ucb1Value))
             .orElseThrow();
 
         return bestNode.moveSequence;
@@ -60,8 +60,7 @@ public class MonteCarlo extends Player {
         List<Integer> roll;
 
         // Perform random moves until the game ends or the max depth is reached
-        int depth = 0;
-        while (!boardCopy.isGameOver() && depth < MAX_DEPTH) {
+        while (!boardCopy.isGameOver() ) {
             roll = generateRandomRoll();
             List<Move[]> possibleMoves = boardCopy.actions(roll, currentPlayer);
 
@@ -73,7 +72,6 @@ public class MonteCarlo extends Player {
             }
 
             currentPlayer = currentPlayer.opponent();
-            depth++;
         }
 
         // Backpropagate the result of this simulation (win or loss)
@@ -92,7 +90,7 @@ public class MonteCarlo extends Player {
         return Arrays.asList(die1, die2);
     }
 
-    private static double ucbValue(Node node) {
+    private static double ucb1Value(Node node) {
         int wins = node.wins;
         int visits = node.visits; // The number of times this move has been explored
 
@@ -102,7 +100,7 @@ public class MonteCarlo extends Player {
         double C = 1.41; // 1.41 is a standard value for UCB
 
         // UCB formula
-        double averageReward = (double) wins / visits;
+        double averageReward = (visits == 0) ? 0 : (double) wins / visits;
         double explorationFactor = C * Math.sqrt(Math.log(totalVisits) / visits);
 
         return averageReward + explorationFactor;

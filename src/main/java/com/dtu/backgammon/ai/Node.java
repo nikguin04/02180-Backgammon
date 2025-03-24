@@ -20,7 +20,14 @@ public class Node {
         this.parent = parent;
     }
 
+    // Method to get total visits (used for UCB formula)
     public int getTotalVisits() {
-        return parent == null ? visits : parent.getTotalVisits();
+        int totalVisits = 0;
+        Node current = this;
+        while (current != null) {
+            totalVisits += current.visits;
+            current = current.parent;
+        }
+        return totalVisits;
     }
 }

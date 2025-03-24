@@ -14,7 +14,7 @@ import com.dtu.backgammon.player.Player;
 //TODO: If you want to play MonteCarlo against Expectiminimax you have to change the writer in startGame()
 public class AI_Evaluation {
 
-    private static final int NUM_GAMES = 1; // Number of games to simulate
+    private static final int NUM_GAMES = 5; // Number of games to simulate
     private static final Random RANDOM = new Random();
     public static FileWriter moveLogWriter;  // Declare writer here so it can be used globally
     public static FileWriter resultLogWriter;
