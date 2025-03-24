@@ -99,20 +99,15 @@ public class AI extends Player {
                 return evaluateBoard(board, AI.this.brick);
             }
 
-            switch (nodeType) {
-                case CHANCE:
-                    return handleChanceNode();
-                case MAX:
-                case MIN:
-                    throw new IllegalStateException("MAX or MIN node must be called with a roll value");
-                default:
-                    throw new IllegalStateException("Unknown node type");
-            }
+            return switch (nodeType) {
+                case CHANCE -> handleChanceNode();
+                case MAX, MIN -> throw new IllegalStateException("MAX or MIN node must be called with a roll value");
+            };
         }
 
         private int handleChanceNode() {
             int totalEval = 0;
-            NodeType nextNodeType = (depth % 2 == 0) ? NodeType.MAX : NodeType.MIN;
+            NodeType nextNodeType = (depth % 4 == 3) ? NodeType.MAX : NodeType.MIN;
             for (Roll roll : ALL_ROLLS) {
                 Board rollSimulatedBoard = board.clone();
                 int eval = new ExpectiminimaxTask(
@@ -134,18 +129,15 @@ public class AI extends Player {
                 return evaluateBoard(board, AI.this.brick);
             }
 
-            switch (nodeType) {
-                case MAX:
-                    return handleMaxNode(roll);
-                case MIN:
-                    return handleMinNode(roll);
-                default:
-                    throw new IllegalStateException("Chance node should not call computeWithRoll");
-            }
+            return switch (nodeType) {
+                case CHANCE -> throw new IllegalStateException("Chance node should not call computeWithRoll");
+                case MAX -> handleMinMaxNode(true, roll);
+                case MIN -> handleMinMaxNode(false, roll);
+            };
         }
 
-        private int handleMaxNode(Roll roll) {
-            int bestEval = Integer.MIN_VALUE;
+        private int handleMinMaxNode(boolean max, Roll roll) {
+            int bestEval = max ? Integer.MIN_VALUE : Integer.MAX_VALUE;
             List<Move[]> possibleMoves = board.actions(roll.values, brick); // Pass roll values
 
             if (possibleMoves.isEmpty()) {
@@ -168,40 +160,13 @@ public class AI extends Player {
                         null
                 ).fork().join();
 
-                bestEval = Math.max(bestEval, eval);
-                alpha = Math.max(alpha, eval);
-
-                if (alpha >= beta) break; // Alpha-beta pruning
-            }
-            return bestEval;
-        }
-
-        private int handleMinNode(Roll roll) {
-            int bestEval = Integer.MAX_VALUE;
-            List<Move[]> possibleMoves = board.actions(roll.values, brick); // Pass roll values
-
-            if (possibleMoves.isEmpty()) {
-                return evaluateBoard(board, AI.this.brick);
-            }
-
-            for (Move[] moveSequence : possibleMoves) {
-                Board simulatedBoard = board.clone();
-                for (Move move : moveSequence) {
-                    simulatedBoard.performMove(move);
+                if (max) {
+                    bestEval = Math.max(bestEval, eval);
+                    alpha = Math.max(alpha, eval);
+                } else {
+                    bestEval = Math.min(bestEval, eval);
+                    beta = Math.min(beta, eval);
                 }
-
-                int eval = new ExpectiminimaxTask(
-                        simulatedBoard,
-                        depth + 1,
-                        NodeType.CHANCE,
-                        brick.opponent(),
-                        alpha,
-                        beta,
-                        null
-                ).fork().join();
-
-                bestEval = Math.min(bestEval, eval);
-                beta = Math.min(beta, eval);
 
                 if (alpha >= beta) break; // Alpha-beta pruning
             }
