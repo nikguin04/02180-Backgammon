@@ -6,16 +6,12 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-import com.dtu.backgammon.App;
 import com.dtu.backgammon.Board;
 import com.dtu.backgammon.Board.Brick;
+import com.dtu.backgammon.Logger;
 import com.dtu.backgammon.Move;
 import com.dtu.backgammon.ai.Evaluation;
 import com.dtu.backgammon.player.Player;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.File;
 
 public class AI extends Player {
     private static final int MAX_DEPTH = 4;
@@ -246,13 +242,7 @@ public class AI extends Player {
                 // Boost the bearing off priority score when the home board count is 15
                 aiScore += 100;
             }
-            if (App.enableEvalWriter) {
-                try {
-                    App.evalWriter.write(String.format("%s,%d,%d,%d,%d,%d,%d\n", brick.name(), blothits, piploss, homeboard, blockades, wintray, stacking));
-                } catch (Exception e) {
-                    System.err.println("Failed to log eval");
-                }
-            }
+            Logger.eval(brick, blothits, piploss, homeboard, blockades, wintray, stacking);
 
             return aiScore;
         }

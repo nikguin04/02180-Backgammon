@@ -1,8 +1,6 @@
 package com.dtu.backgammon;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -16,16 +14,13 @@ import com.dtu.backgammon.player.Human;
  */
 public class App {
     public static Scanner scanner;
-    public static Writer logWriter;
-    public static boolean enableEvalWriter = false;
-    public static Writer evalWriter;
+    public static final boolean enableEvalWriter = false;
 
     public static void main(String[] args) throws IOException {
 
-        logWriter = new FileWriter("log.txt");
+        Logger.init("log.txt");
         if (enableEvalWriter) {
-            evalWriter = new FileWriter("eval.csv");
-            evalWriter.write("brick,blot,piploss,homeboard,blockades,wintray,stacking\n"); // Suboptimal, but works
+            Logger.initEval("eval.csv");
         }
 
         scanner = new Scanner(System.in);
@@ -33,8 +28,7 @@ public class App {
         setupPlayers(board);
         board.startGame();
 
-        logWriter.close();
-        if (enableEvalWriter) { evalWriter.close(); }
+        Logger.close();
 
         /*board.homeBoardWhite = 15;
         board.setColumn(21, Brick.WHITE, 1);
